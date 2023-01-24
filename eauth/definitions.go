@@ -104,7 +104,7 @@ type EAuthRefreshToken struct {
 }
 
 type EAuthSync struct {
-	CronJog string `json:"cronJog" yaml:"cronJog"`
+	CronJob string `json:"cronJob" yaml:"cronJob"`
 	Address string `json:"address" yaml:"address"`
 	Token   string `json:"token" yaml:"token"`
 	Groups  string `json:"groups" yaml:"groups"`
