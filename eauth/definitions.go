@@ -102,3 +102,9 @@ type EAuthRefreshToken struct {
 	Issuer    string `json:"issuer"`
 	Provider  string `json:"provider"`
 }
+
+type EAuthSync struct {
+	Address string `json:"address" yaml:"address"`
+	Token   string `json:"token" yaml:"token"`
+	Groups  string `json:"groups" yaml:"groups"`
+}
