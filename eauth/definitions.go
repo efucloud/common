@@ -29,7 +29,7 @@ type OIDCConfig struct {
 	GroupsClaim    string `json:"groupsClaim" yaml:"groupsClaim,omitempty"`
 	GroupsPrefix   string `json:"groupsPrefix" yaml:"groupsPrefix,omitempty"`
 }
-type EAuthUserinfo struct {
+type UserInfo struct {
 	Subject          string                 `json:"sub"`
 	Profile          string                 `json:"profile"`
 	Email            string                 `json:"email"`
@@ -60,7 +60,7 @@ type ApplicationSyncAccountInfo struct {
 	Email            string                 `json:"email" yaml:"email"`
 	Phone            string                 `json:"phone" yaml:"phone"`
 }
-type EAuthClaims struct {
+type AccountClaims struct {
 	AccountID    uint   `json:"accountId" `
 	Org          string `json:"org"`
 	AuthProvider string `json:"authProvider" `
@@ -94,7 +94,7 @@ type AccessTokenResponse struct {
 	IDToken      string `json:"id_token"`
 }
 
-type EAuthRefreshToken struct {
+type RefreshToken struct {
 	Org       string `json:"org"`
 	App       string `json:"app"`
 	ExpiresIn int64  `json:"expiresIn"`
@@ -103,7 +103,7 @@ type EAuthRefreshToken struct {
 	Provider  string `json:"provider"`
 }
 
-type EAuthSync struct {
+type AccountSync struct {
 	CronJob string `json:"cronJob" yaml:"cronJob"`
 	Address string `json:"address" yaml:"address"`
 	Token   string `json:"token" yaml:"token"`
