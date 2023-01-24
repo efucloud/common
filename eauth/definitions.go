@@ -26,8 +26,6 @@ type OIDCConfig struct {
 	IssuerCA       string `json:"issuerCa" yaml:"issuerCa,omitempty"`
 	UsernameClaim  string `json:"usernameClaim" yaml:"usernameClaim,omitempty"`
 	UsernamePrefix string `json:"usernamePrefix" yaml:"usernamePrefix,omitempty"`
-	GroupsClaim    string `json:"groupsClaim" yaml:"groupsClaim,omitempty"`
-	GroupsPrefix   string `json:"groupsPrefix" yaml:"groupsPrefix,omitempty"`
 }
 type UserInfo struct {
 	Subject          string                 `json:"sub"`
@@ -104,8 +102,9 @@ type RefreshToken struct {
 }
 
 type AccountSync struct {
-	CronJob string `json:"cronJob" yaml:"cronJob"`
-	Address string `json:"address" yaml:"address"`
-	Token   string `json:"token" yaml:"token"`
-	Groups  string `json:"groups" yaml:"groups"`
+	CronJob      string   `json:"cronJob" yaml:"cronJob"`
+	Address      string   `json:"address" yaml:"address"`
+	Token        string   `json:"token" yaml:"token"`
+	Groups       []string `json:"groups" yaml:"groups"`
+	GroupsPrefix string   `json:"groupsPrefix" yaml:"groupsPrefix,omitempty"`
 }
