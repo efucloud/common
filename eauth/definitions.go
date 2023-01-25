@@ -57,6 +57,7 @@ type ApplicationSyncAccountInfo struct {
 	Language         string                 `json:"language" validate:"oneof=en zh"`  // 语言
 	Email            string                 `json:"email" yaml:"email"`
 	Phone            string                 `json:"phone" yaml:"phone"`
+	Groups           []string               `json:"groups" yaml:"groups"`
 }
 type AccountClaims struct {
 	AccountID    uint   `json:"accountId" `
