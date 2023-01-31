@@ -106,9 +106,6 @@ type RefreshToken struct {
 }
 
 type AccountSync struct {
-	CronJob      string   `json:"cronJob" yaml:"cronJob"`
-	Address      string   `json:"address" yaml:"address"`
-	Token        string   `json:"token" yaml:"token"`
-	Groups       []string `json:"groups" yaml:"groups"`
-	GroupsPrefix string   `json:"groupsPrefix" yaml:"groupsPrefix,omitempty"`
+	CronJob      string `json:"cronJob" yaml:"cronJob"`
+	Organization string `json:"organization" yaml:"organization"`
 }
