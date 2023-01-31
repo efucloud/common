@@ -20,6 +20,9 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -298,4 +301,31 @@ func Request(method, address string, headers map[string]string, queries map[stri
 	}
 	req.URL.RawQuery = queryValues.Encode()
 	return client.Do(req)
+}
+
+func NewHTTPClientWithCA(rootCA string, insecureSkipVerify bool) (client *http.Client, err error) {
+
+	var block *pem.Block
+	block, _ = pem.Decode([]byte(rootCA))
+	if block == nil {
+		err = errors.New("ca decode failed")
+	}
+	// Only use PEM "CERTIFICATE" blocks without extra headers
+	if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
+		err = fmt.Errorf("ca decode failed, block type: %s is not CERTIFICATE", block.Type)
+	}
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		err = fmt.Errorf("ca decode failed, err: %s", err.Error())
+	}
+	pool := x509.NewCertPool()
+	pool.AddCert(cert)
+	// Copied from http.DefaultTransport.
+	tr := &http.Transport{
+		// According to golang's doc, if RootCAs is nil,
+		// TLS uses the host's root CA set.
+		TLSClientConfig: &tls.Config{RootCAs: pool},
+	}
+	client = &http.Client{Transport: tr, Timeout: 30 * time.Second}
+	return client, err
 }
