@@ -106,7 +106,6 @@ type RefreshToken struct {
 }
 
 type AccountSync struct {
-	CronJob      string `json:"cronJob"`
-	Organization string `json:"organization"`
-	Address      string `json:"address"`
+	CronJob string `json:"cronJob"`
+	Address string `json:"address"`
 }
