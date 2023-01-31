@@ -35,6 +35,7 @@ type UserInfo struct {
 	Org              string                 `json:"org"`
 	OrgCustoms       map[string]interface{} `json:"orgCustoms"` // 组织自定义属性
 	Providers        []string               `json:"providers"`
+	Groups           []string               `json:"groups"`
 	RegistrationFrom string                 `json:"registrationFrom"` // 注册渠道
 	AuthProvider     string                 `json:"authProvider"`     // 认证提供商
 	Username         string                 `json:"username"`         // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成
@@ -69,8 +70,8 @@ type AccountClaims struct {
 	Nonce           string   `json:"nonce"`
 	Email           string   `json:"email"`
 	Phone           string   `json:"phone"`
-	Groups          []string `json:"groups" yaml:"groups"`
-	AuthApplication string   `json:"authApplication" yaml:"authApplication"`
+	Groups          []string `json:"groups"`
+	AuthApplication string   `json:"authApplication"`
 	jwt.RegisteredClaims
 }
 
