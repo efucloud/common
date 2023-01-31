@@ -28,6 +28,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/net/http2"
 	"k8s.io/klog/v2"
+	"net"
 	"net/http"
 	"net/url"
 	"strings"
@@ -321,11 +322,21 @@ func NewHTTPClientWithCA(rootCA string, insecureSkipVerify bool) (client *http.C
 	pool := x509.NewCertPool()
 	pool.AddCert(cert)
 	// Copied from http.DefaultTransport.
-	tr := &http.Transport{
-		// According to golang's doc, if RootCAs is nil,
-		// TLS uses the host's root CA set.
-		TLSClientConfig: &tls.Config{RootCAs: pool},
+	tlsConfig := tls.Config{RootCAs: pool, InsecureSkipVerify: insecureSkipVerify}
+	client = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tlsConfig,
+			Proxy:           http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+				DualStack: true,
+			}).DialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+		},
 	}
-	client = &http.Client{Transport: tr, Timeout: 30 * time.Second}
 	return client, err
 }
