@@ -310,14 +310,18 @@ func NewHTTPClientWithCA(rootCA string, insecureSkipVerify bool) (client *http.C
 	block, _ = pem.Decode([]byte(rootCA))
 	if block == nil {
 		err = errors.New("ca decode failed")
+		return nil, err
 	}
 	// Only use PEM "CERTIFICATE" blocks without extra headers
 	if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {
 		err = fmt.Errorf("ca decode failed, block type: %s is not CERTIFICATE", block.Type)
+		return nil, err
+
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
 		err = fmt.Errorf("ca decode failed, err: %s", err.Error())
+		return nil, err
 	}
 	pool := x509.NewCertPool()
 	pool.AddCert(cert)
