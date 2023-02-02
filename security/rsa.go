@@ -64,6 +64,65 @@ func GenerateRASPrivateAndPublicKeys() (privateKey, publicKey []byte, err error)
 	publicKey = pem.EncodeToMemory(&block)
 	return privateKey, publicKey, nil
 }
+func PublicKeyEncrypt(publicKey, input []byte) ([]byte, error) {
+	block, _ := pem.Decode(publicKey)
+	if block == nil {
+		return nil, errors.New("get public key error")
+	}
+	// x509 parse public key
+	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return pubKeyByte(pub.(*rsa.PublicKey), input, true)
+}
+
+func PublicKeyDecrypt(publicKey, input []byte) ([]byte, error) {
+	block, _ := pem.Decode(publicKey)
+	if block == nil {
+		return nil, errors.New("get public key error")
+	}
+	// x509 parse public key
+	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return pubKeyByte(pub.(*rsa.PublicKey), input, false)
+}
+
+// PrivateKeyEncrypt
+func PrivateKeyEncrypt(privateKey, input []byte) ([]byte, error) {
+	block, _ := pem.Decode(privateKey)
+	if block == nil {
+		return nil, errors.New("get private key error")
+	}
+	pk, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		pri2, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		pk = pri2.(*rsa.PrivateKey)
+	}
+	return priKeyByte(pk, input, true)
+}
+
+// PrivateKeyDecrypt
+func PrivateKeyDecrypt(privateKey, input []byte) ([]byte, error) {
+	block, _ := pem.Decode(privateKey)
+	if block == nil {
+		return nil, errors.New("get private key error")
+	}
+	pk, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		pri2, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		pk = pri2.(*rsa.PrivateKey)
+	}
+	return priKeyByte(pk, input, false)
+}
 
 // PublicKeyEncrypt
 func (s *RsaSecurity) PublicKeyEncrypt(input []byte) ([]byte, error) {
