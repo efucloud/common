@@ -64,7 +64,26 @@ func GenerateRASPrivateAndPublicKeys() (privateKey, publicKey []byte, err error)
 	publicKey = pem.EncodeToMemory(&block)
 	return privateKey, publicKey, nil
 }
-func PublicKeyEncrypt(publicKey, input []byte) ([]byte, error) {
+
+func PublicKeyEncrypt(input []byte, pub *rsa.PublicKey) ([]byte, error) {
+	return pubKeyByte(pub, input, true)
+}
+
+func PublicKeyDecrypt(input []byte, pub *rsa.PublicKey) ([]byte, error) {
+	return pubKeyByte(pub, input, false)
+}
+
+// PrivateKeyEncrypt
+func PrivateKeyEncrypt(input []byte, pri *rsa.PrivateKey) ([]byte, error) {
+	return priKeyByte(pri, input, true)
+}
+
+// PrivateKeyDecrypt
+func PrivateKeyDecrypt(input []byte, pri *rsa.PrivateKey) ([]byte, error) {
+	return priKeyByte(pri, input, false)
+}
+
+func PublicKeyByteEncrypt(publicKey, input []byte) ([]byte, error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
 		return nil, errors.New("get public key error")
@@ -77,7 +96,7 @@ func PublicKeyEncrypt(publicKey, input []byte) ([]byte, error) {
 	return pubKeyByte(pub.(*rsa.PublicKey), input, true)
 }
 
-func PublicKeyDecrypt(publicKey, input []byte) ([]byte, error) {
+func PublicKeyByteDecrypt(publicKey, input []byte) ([]byte, error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
 		return nil, errors.New("get public key error")
@@ -90,8 +109,8 @@ func PublicKeyDecrypt(publicKey, input []byte) ([]byte, error) {
 	return pubKeyByte(pub.(*rsa.PublicKey), input, false)
 }
 
-// PrivateKeyEncrypt
-func PrivateKeyEncrypt(privateKey, input []byte) ([]byte, error) {
+// PrivateKeyByteEncrypt
+func PrivateKeyByteEncrypt(privateKey, input []byte) ([]byte, error) {
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
 		return nil, errors.New("get private key error")
@@ -107,8 +126,8 @@ func PrivateKeyEncrypt(privateKey, input []byte) ([]byte, error) {
 	return priKeyByte(pk, input, true)
 }
 
-// PrivateKeyDecrypt
-func PrivateKeyDecrypt(privateKey, input []byte) ([]byte, error) {
+// PrivateKeyByteDecrypt
+func PrivateKeyByteDecrypt(privateKey, input []byte) ([]byte, error) {
 	block, _ := pem.Decode(privateKey)
 	if block == nil {
 		return nil, errors.New("get private key error")
