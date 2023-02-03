@@ -14,11 +14,13 @@ type RsaSecurity struct {
 }
 
 func NewRsaSecurityFromRsaKey(publicKey *rsa.PublicKey, privateKey *rsa.PrivateKey) (result *RsaSecurity) {
+	result = &RsaSecurity{}
 	result.publicKey = publicKey
 	result.privateKey = privateKey
 	return
 }
 func NewRsaSecurityFromStringKey(publicKey, privateKey string) (result *RsaSecurity, err error) {
+	result = &RsaSecurity{}
 	if len(publicKey) > 0 {
 		block, _ := pem.Decode([]byte(publicKey))
 		if block == nil {
