@@ -3,6 +3,7 @@ package security
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
@@ -67,112 +68,44 @@ func GenerateRASPrivateAndPublicKeys() (privateKey, publicKey []byte, err error)
 	return privateKey, publicKey, nil
 }
 
-func PublicKeyEncrypt(input []byte, pub *rsa.PublicKey) ([]byte, error) {
-	return pubKeyByte(pub, input, true)
-}
+func (s *RsaSecurity) PublicKeyEncrypt(input []byte) (data []byte, err error) {
+	msgLen := len(input)
+	h := sha256.New()
+	rng := rand.Reader
+	label := []byte("efucloud-encrypt")
+	step := s.publicKey.Size() - 2*h.Size() - 2
 
-func PublicKeyDecrypt(input []byte, pub *rsa.PublicKey) ([]byte, error) {
-	return pubKeyByte(pub, input, false)
-}
-
-// PrivateKeyEncrypt
-func PrivateKeyEncrypt(input []byte, pri *rsa.PrivateKey) ([]byte, error) {
-	return priKeyByte(pri, input, true)
-}
-
-// PrivateKeyDecrypt
-func PrivateKeyDecrypt(input []byte, pri *rsa.PrivateKey) ([]byte, error) {
-	return priKeyByte(pri, input, false)
-}
-
-func PublicKeyByteEncrypt(publicKey, input []byte) ([]byte, error) {
-	block, _ := pem.Decode(publicKey)
-	if block == nil {
-		return nil, errors.New("get public key error")
-	}
-	// x509 parse public key
-	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	return pubKeyByte(pub.(*rsa.PublicKey), input, true)
-}
-
-func PublicKeyByteDecrypt(publicKey, input []byte) ([]byte, error) {
-	block, _ := pem.Decode(publicKey)
-	if block == nil {
-		return nil, errors.New("get public key error")
-	}
-	// x509 parse public key
-	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	return pubKeyByte(pub.(*rsa.PublicKey), input, false)
-}
-
-// PrivateKeyByteEncrypt
-func PrivateKeyByteEncrypt(privateKey, input []byte) ([]byte, error) {
-	block, _ := pem.Decode(privateKey)
-	if block == nil {
-		return nil, errors.New("get private key error")
-	}
-	pk, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		pri2, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	for start := 0; start < msgLen; start += step {
+		finish := start + step
+		if finish > msgLen {
+			finish = msgLen
+		}
+		encryptedBlockBytes, err := rsa.EncryptOAEP(h, rng, s.publicKey, input[start:finish], label)
 		if err != nil {
 			return nil, err
 		}
-		pk = pri2.(*rsa.PrivateKey)
+		data = append(data, encryptedBlockBytes...)
 	}
-	return priKeyByte(pk, input, true)
+	return data, nil
 }
 
-// PrivateKeyByteDecrypt
-func PrivateKeyByteDecrypt(privateKey, input []byte) ([]byte, error) {
-	block, _ := pem.Decode(privateKey)
-	if block == nil {
-		return nil, errors.New("get private key error")
-	}
-	pk, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		pri2, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+func (s *RsaSecurity) PrivateKeyDecrypt(input []byte) (data []byte, err error) {
+	msgLen := len(input)
+	step := s.privateKey.PublicKey.Size()
+	h := sha256.New()
+	rng := rand.Reader
+	label := []byte("efucloud-encrypt")
+	for start := 0; start < msgLen; start += step {
+		finish := start + step
+		if finish > msgLen {
+			finish = msgLen
+		}
+		decryptedBlockBytes, err := rsa.DecryptOAEP(h, rng, s.privateKey, input[start:finish], label)
 		if err != nil {
 			return nil, err
 		}
-		pk = pri2.(*rsa.PrivateKey)
+		data = append(data, decryptedBlockBytes...)
 	}
-	return priKeyByte(pk, input, false)
-}
 
-// PublicKeyEncrypt
-func (s *RsaSecurity) PublicKeyEncrypt(input []byte) ([]byte, error) {
-	if s.publicKey == nil {
-		return []byte(""), errors.New(`please set the public key in advance`)
-	}
-	return pubKeyByte(s.publicKey, input, true)
-}
-
-// PublicKeyDecrypt
-func (s *RsaSecurity) PublicKeyDecrypt(input []byte) ([]byte, error) {
-	if s.publicKey == nil {
-		return []byte(""), errors.New(`please set the public key in advance`)
-	}
-	return pubKeyByte(s.publicKey, input, false)
-}
-
-// PrivateKeyEncrypt
-func (s *RsaSecurity) PrivateKeyEncrypt(input []byte) ([]byte, error) {
-	if s.privateKey == nil {
-		return []byte(""), errors.New(`please set the private key in advance`)
-	}
-	return priKeyByte(s.privateKey, input, true)
-}
-
-// PrivateKeyDecrypt
-func (s *RsaSecurity) PrivateKeyDecrypt(input []byte) ([]byte, error) {
-	if s.privateKey == nil {
-		return []byte(""), errors.New(`please set the private key in advance`)
-	}
-	return priKeyByte(s.privateKey, input, false)
+	return data, nil
 }
