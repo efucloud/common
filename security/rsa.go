@@ -68,13 +68,13 @@ func GenerateRASPrivateAndPublicKeys() (privateKey, publicKey []byte, err error)
 	return privateKey, publicKey, nil
 }
 
-func (s *RsaSecurity) PublicKeyEncrypt(input []byte) (data []byte, err error) {
+func (s *RsaSecurity) PublicKeyEncrypt(input []byte) (encryptedBlockBytes []byte, err error) {
 	msgLen := len(input)
 	h := sha256.New()
 	rng := rand.Reader
 	label := []byte("efucloud-encrypt")
 	step := s.publicKey.Size() - 2*h.Size() - 2
-
+	var encryptedBytes []byte
 	for start := 0; start < msgLen; start += step {
 		finish := start + step
 		if finish > msgLen {
@@ -84,12 +84,14 @@ func (s *RsaSecurity) PublicKeyEncrypt(input []byte) (data []byte, err error) {
 		if err != nil {
 			return nil, err
 		}
-		data = append(data, encryptedBlockBytes...)
+
+		encryptedBytes = append(encryptedBytes, encryptedBlockBytes...)
 	}
-	return data, nil
+
+	return encryptedBytes, nil
 }
 
-func (s *RsaSecurity) PrivateKeyDecrypt(input []byte) (data []byte, err error) {
+func (s *RsaSecurity) PrivateKeyDecrypt(input []byte) (decryptedBytes []byte, err error) {
 	msgLen := len(input)
 	step := s.privateKey.PublicKey.Size()
 	h := sha256.New()
@@ -104,8 +106,8 @@ func (s *RsaSecurity) PrivateKeyDecrypt(input []byte) (data []byte, err error) {
 		if err != nil {
 			return nil, err
 		}
-		data = append(data, decryptedBlockBytes...)
+		decryptedBytes = append(decryptedBytes, decryptedBlockBytes...)
 	}
 
-	return data, nil
+	return decryptedBytes, nil
 }
