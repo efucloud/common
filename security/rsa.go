@@ -6,7 +6,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type RsaSecurity struct {
@@ -20,34 +20,13 @@ func NewRsaSecurityFromRsaKey(publicKey *rsa.PublicKey, privateKey *rsa.PrivateK
 	result.privateKey = privateKey
 	return
 }
-func NewRsaSecurityFromStringKey(publicKey, privateKey string) (result *RsaSecurity, err error) {
+func NewRsaSecurityFromStringKey(publicPem, privatePem string) (result *RsaSecurity, err error) {
 	result = &RsaSecurity{}
-	if len(publicKey) > 0 {
-		block, _ := pem.Decode([]byte(publicKey))
-		if block == nil {
-			return nil, errors.New("get public key error")
-		}
-		// x509 parse public key
-		pub, err := x509.ParsePKIXPublicKey(block.Bytes)
-		if err != nil {
-			return nil, err
-		}
-		result.publicKey = pub.(*rsa.PublicKey)
+	result.publicKey, err = jwt.ParseRSAPublicKeyFromPEM([]byte(publicPem))
+	if err != nil {
+		return nil, err
 	}
-	if len(privateKey) > 0 {
-		block, _ := pem.Decode([]byte(privateKey))
-		if block == nil {
-			return nil, errors.New("get private key error")
-		}
-		result.privateKey, err = x509.ParsePKCS1PrivateKey(block.Bytes)
-		if err != nil {
-			pri2, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-			if err != nil {
-				return nil, err
-			}
-			result.privateKey = pri2.(*rsa.PrivateKey)
-		}
-	}
+	result.privateKey, err = jwt.ParseRSAPrivateKeyFromPEM([]byte(privatePem))
 	return
 }
 
