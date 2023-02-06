@@ -6,15 +6,15 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func ParserToken(tokenStr string, verifyKeys []*rsa.PublicKey) (*AccountClaims, error) {
+func ParserToken(tokenStr string, verifyKeys []*rsa.PublicKey) (claims AccountClaims, err error) {
 	for _, verifyKey := range verifyKeys {
 		token, err := jwt.ParseWithClaims(tokenStr, &AccountClaims{}, func(token *jwt.Token) (i interface{}, e error) {
 			return verifyKey, nil
 		})
-		claims, ok := token.Claims.(*AccountClaims)
+		cla, ok := token.Claims.(*AccountClaims)
 		if ok && token.Valid {
-			return claims, err
+			return *cla, err
 		}
 	}
-	return nil, errors.New("token invalid")
+	return claims, errors.New("token invalid")
 }
