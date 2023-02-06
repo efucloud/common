@@ -23,9 +23,10 @@ type OIDCConfig struct {
 	ClientID       string `json:"clientId" yaml:"clientId"`
 	ClientSecret   string `json:"clientSecret" yaml:"clientSecret"`
 	RedirectURI    string `json:"redirectUri" yaml:"redirectUri"`
-	IssuerCA       string `json:"issuerCa" yaml:"issuerCa,omitempty"`
-	UsernameClaim  string `json:"usernameClaim" yaml:"usernameClaim,omitempty"`
-	UsernamePrefix string `json:"usernamePrefix" yaml:"usernamePrefix,omitempty"`
+	IssuerCA       string `json:"issuerCa" yaml:"issuerCa"`
+	UsernameClaim  string `json:"usernameClaim" yaml:"usernameClaim"`
+	UsernamePrefix string `json:"usernamePrefix" yaml:"usernamePrefix"`
+	Certificate    string `json:"certificate" yaml:"certificate"`
 }
 type UserInfo struct {
 	Subject          string                 `json:"sub"`
