@@ -133,6 +133,14 @@ func KeyInArray(key string, arrays []string) (exist bool) {
 	}
 	return
 }
+func DeleteKeyFromArray(key string, arrays []string) (results []string) {
+	for _, v := range arrays {
+		if key != v {
+			results = append(results, v)
+		}
+	}
+	return
+}
 func String2Int(str string, defVal int) int {
 	if in, err := strconv.Atoi(str); err != nil {
 		return defVal
