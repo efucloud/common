@@ -136,10 +136,12 @@ func ResponseSuccess(resp *restful.Response, info interface{}) {
 	resp.WriteAsJson(info)
 
 }
-func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, message, redirect string, ctx context.Context) {
+func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, message, redirect string,
+	params map[string]interface{}, ctx context.Context) {
 	resp.WriteHeader(http.StatusUnauthorized)
 	var body AuthRedirectInfo
 	body.Message = message
+	body.Params = params
 	body.RedirectUri = redirect
 	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
 	_ = resp.WriteAsJson(body)
