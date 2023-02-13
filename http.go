@@ -120,6 +120,11 @@ type ResponseError struct {
 	Detail  string `json:"detail" yaml:"detail"`
 	Alert   string `json:"alert" yaml:"alert"`
 }
+type AuthRedirectInfo struct {
+	Message     string `json:"message" yaml:"message"`
+	RedirectUrl string `json:"redirectUrl"`
+	Alert       string `json:"alert" yaml:"alert"`
+}
 
 type ResponseList struct {
 	Data  any   `json:"data" yaml:"data"`
@@ -129,6 +134,14 @@ type ResponseList struct {
 func ResponseSuccess(resp *restful.Response, info interface{}) {
 	resp.WriteAsJson(info)
 
+}
+func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, message, redirect string, ctx context.Context) {
+	resp.WriteHeader(http.StatusUnauthorized)
+	var body AuthRedirectInfo
+	body.Message = message
+	body.RedirectUrl = redirect
+	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
+	_ = resp.WriteAsJson(body)
 }
 func ResponseErrorMessage(resp *restful.Response, bundle *i18n.Bundle, code int, lang, message, detail string, ctx context.Context) {
 	resp.WriteHeader(code)
