@@ -121,9 +121,10 @@ type ResponseError struct {
 	Alert   string `json:"alert" yaml:"alert"`
 }
 type AuthRedirectInfo struct {
-	Message     string `json:"message" yaml:"message"`
-	RedirectUri string `json:"redirectUri"`
-	Alert       string `json:"alert" yaml:"alert"`
+	Message     string                 `json:"message" yaml:"message"`
+	RedirectUri string                 `json:"redirectUri"`
+	Params      map[string]interface{} `json:"params"`
+	Alert       string                 `json:"alert" yaml:"alert"`
 }
 
 type ResponseList struct {
