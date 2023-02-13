@@ -122,7 +122,7 @@ type ResponseError struct {
 }
 type AuthRedirectInfo struct {
 	Message     string `json:"message" yaml:"message"`
-	RedirectUrl string `json:"redirectUrl"`
+	RedirectUri string `json:"redirectUri"`
 	Alert       string `json:"alert" yaml:"alert"`
 }
 
