@@ -139,7 +139,7 @@ func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, mes
 	resp.WriteHeader(http.StatusUnauthorized)
 	var body AuthRedirectInfo
 	body.Message = message
-	body.RedirectUrl = redirect
+	body.RedirectUri = redirect
 	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
 	_ = resp.WriteAsJson(body)
 }
