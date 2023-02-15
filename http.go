@@ -21,6 +21,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -294,7 +295,7 @@ func TokenErr(resp *restful.Response, typ, description string, statusCode int) e
 	return nil
 }
 
-func Request(method, address string, headers map[string]string, queries map[string]interface{}, body string) (response *http.Response, err error) {
+func Request(method, address string, headers map[string]string, queries map[string]interface{}, body interface{}) (response *http.Response, err error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -302,8 +303,10 @@ func Request(method, address string, headers map[string]string, queries map[stri
 		Timeout: 10 * time.Second,
 	}
 	b := new(bytes.Buffer)
-	b.Write([]byte(body))
-
+	err = json.NewEncoder(b).Encode(body)
+	if err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequest(method, address, b)
 	if err != nil {
 		klog.Errorf("create request failed, err: %s", err.Error())
