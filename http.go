@@ -136,7 +136,7 @@ func ResponseSuccess(resp *restful.Response, info interface{}) {
 	resp.WriteAsJson(info)
 
 }
-func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, message, authorizationEndpoint string,
+func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, message string,
 	params map[string]interface{}, ctx context.Context) {
 	resp.WriteHeader(http.StatusUnauthorized)
 	var body AuthRedirectInfo
