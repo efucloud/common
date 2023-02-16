@@ -122,10 +122,9 @@ type ResponseError struct {
 	Alert   string `json:"alert" yaml:"alert"`
 }
 type AuthRedirectInfo struct {
-	Message               string                 `json:"message"`
-	AuthorizationEndpoint string                 `json:"authorizationEndpoint"`
-	Params                map[string]interface{} `json:"params"`
-	Alert                 string                 `json:"alert"`
+	Message string                 `json:"message"`
+	Params  map[string]interface{} `json:"params"`
+	Alert   string                 `json:"alert"`
 }
 
 type ResponseList struct {
@@ -143,7 +142,6 @@ func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, mes
 	var body AuthRedirectInfo
 	body.Message = message
 	body.Params = params
-	body.AuthorizationEndpoint = authorizationEndpoint
 	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
 	_ = resp.WriteAsJson(body)
 }
