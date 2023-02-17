@@ -51,7 +51,7 @@ type ApplicationSyncAccountInfo struct {
 	Organization     string                 `json:"organization" validate:"required"` // 组织编码
 	Username         string                 `json:"username" validate:"dns1123"`      // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成
 	Nickname         string                 `json:"nickname"`                         // 昵称，如中文名
-	AppRole          string                 `json:"appRole"`                          // 应用角色
+	AdminApps        []string               `json:"adminApps"`                        // 应用管理员
 	Enable           uint                   `json:"enable" validate:"oneof=0 1"`      // 是否有效，组织管理员不能设置为无效
 	OrgCustoms       map[string]interface{} `json:"orgCustoms"`                       // 组织自定义属性
 	Hash             string                 `json:"hash"`                             // 组织:用户名的Hash
