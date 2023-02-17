@@ -67,7 +67,7 @@ type AccountClaims struct {
 	AuthProvider string   `json:"authProvider"`
 	Username     string   `json:"username"` // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成
 	Nickname     string   `json:"nickname"` // 昵称，如中文名
-	OrgAdmin     bool     `json:"orgAdmin"` // 是否为组织管理员，内建组织具有所有组织的权限
+	OrgRole      string   `json:"orgRole"`  // 组织角色
 	Nonce        string   `json:"nonce"`
 	Email        string   `json:"email"`
 	Phone        string   `json:"phone"`
