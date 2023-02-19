@@ -19,14 +19,23 @@ package eauth
 import "github.com/golang-jwt/jwt/v4"
 
 type OIDCConfig struct {
-	Issuer         string `json:"issuer" yaml:"issuer"`
-	ClientID       string `json:"clientId" yaml:"clientId"`
-	ClientSecret   string `json:"clientSecret" yaml:"clientSecret"`
-	RedirectURI    string `json:"redirectUri" yaml:"redirectUri"`
+	// 提供商的地址，如https://gitlab.com,在不配置Certificate的情况下，程序会根据https://gitlab.com/.well-known/openid-configuration获取token的公钥
+	Issuer string `json:"issuer" yaml:"issuer"`
+	// 应用的ClientID
+	ClientID string `json:"clientId" yaml:"clientId"`
+	// 应用的ClientSecret
+	ClientSecret string `json:"clientSecret" yaml:"clientSecret"`
+	// 跳转到认证的页面，如https://gitlab.com/oauth/authorize，该信息会返回给前端用于前端组成认证重定向地址
+	AuthorizationEndpoint string `json:"authorizationEndpoint" yaml:"authorizationEndpoint"`
+	// 认证完成后的重定向地址，用于接收返回的code，如gitlab认证成功后返回的code,state或者err信息
+	RedirectURI string `json:"redirectUri" yaml:"redirectUri"`
+	// 提供商的ca信息，可以不提供，
 	IssuerCA       string `json:"issuerCa" yaml:"issuerCa"`
 	UsernameClaim  string `json:"usernameClaim" yaml:"usernameClaim"`
 	UsernamePrefix string `json:"usernamePrefix" yaml:"usernamePrefix"`
-	Certificate    string `json:"certificate" yaml:"certificate"`
+	// token校验的公钥信息，若不配置，应用需要根据Issuer+/.well-known/openid-configuration去获取
+	// 若以gitlab为例https://gitlab.com/.well-known/openid-configuration
+	Certificate string `json:"certificate" yaml:"certificate"`
 }
 type UserInfo struct {
 	Subject          string                 `json:"sub"`
@@ -78,7 +87,7 @@ type AccountClaims struct {
 	jwt.RegisteredClaims
 }
 
-//LocalLoginParam 本地登录请求
+// LocalLoginParam 本地登录请求
 type LocalLoginParam struct {
 	Method      string `json:"method" validate:"oneof=password phoneCode emailCode"` // 登录类型，用户名密码/手机验证码/邮箱验证码/
 	Username    string `json:"username"`
