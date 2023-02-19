@@ -122,9 +122,10 @@ type ResponseError struct {
 	Alert   string `json:"alert" yaml:"alert"`
 }
 type AuthRedirectInfo struct {
-	Message string                 `json:"message"`
-	Params  map[string]interface{} `json:"params"`
-	Alert   string                 `json:"alert"`
+	Message               string                 `json:"message"`
+	Params                map[string]interface{} `json:"params"`
+	AuthorizationEndpoint string                 `json:"authorizationEndpoint"`
+	Alert                 string                 `json:"alert"`
 }
 
 type ResponseList struct {
@@ -136,12 +137,13 @@ func ResponseSuccess(resp *restful.Response, info interface{}) {
 	resp.WriteAsJson(info)
 
 }
-func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, message string,
+func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, message, authorizationEndpoint string,
 	params map[string]interface{}, ctx context.Context) {
 	resp.WriteHeader(http.StatusUnauthorized)
 	var body AuthRedirectInfo
 	body.Message = message
 	body.Params = params
+	body.AuthorizationEndpoint = authorizationEndpoint
 	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
 	_ = resp.WriteAsJson(body)
 }
@@ -164,7 +166,7 @@ func ResponseErrorMessage(resp *restful.Response, bundle *i18n.Bundle, code int,
 	_ = resp.WriteAsJson(body)
 }
 
-//RequestQuery paramType: string,number queryType: eq,like
+// RequestQuery paramType: string,number queryType: eq,like
 func RequestQuery(name, paramType, queryType string, req *restful.Request, queryParam *QueryParam) {
 	value := req.QueryParameter(name)
 	nv := strings.TrimSpace(value)
@@ -230,7 +232,7 @@ func RequestQuery(name, paramType, queryType string, req *restful.Request, query
 	}
 }
 
-//RequestQuerySearch queryType: eq,like use 'or' to connect
+// RequestQuerySearch queryType: eq,like use 'or' to connect
 func RequestQuerySearch(value, queryType string, fields []string, queryParam *QueryParam) {
 	if len(value) == 0 || len(fields) == 0 {
 		return
