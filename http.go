@@ -196,7 +196,7 @@ func RequestQuery(name, paramType, queryType string, req *restful.Request, query
 				} else {
 					queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
 				}
-				if strings.TrimSpace(nv) == "0" || strings.TrimSpace(strings.ToUpper(nv)) == "F" || strings.TrimSpace(strings.ToUpper(nv)) == "TRUE" {
+				if strings.TrimSpace(nv) == "0" || strings.TrimSpace(strings.ToUpper(nv)) == "F" || strings.TrimSpace(strings.ToUpper(nv)) == "FALSE" {
 					queryParam.WhereArgs = append(queryParam.WhereArgs, 0)
 				} else {
 					queryParam.WhereArgs = append(queryParam.WhereArgs, 1)
