@@ -56,6 +56,7 @@ type UserInfo struct {
 	Username         string                 `json:"username"`         // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成
 	Nickname         string                 `json:"nickname"`         // 昵称，如中文名
 	OrgRole          string                 `json:"orgRole"`          //组织角色
+	Category         string                 `json:"category"`
 	Phone            string                 `json:"phone"`
 	ID               uint                   `json:"id"`
 }
