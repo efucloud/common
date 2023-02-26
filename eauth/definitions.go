@@ -89,6 +89,7 @@ type AccountClaims struct {
 	AppCode      string   `json:"appCode"`
 	AppClientID  string   `json:"appClientId"`
 	AppOwner     bool     `json:"appOwner"`
+	Category     string   `json:"category"`
 	jwt.RegisteredClaims
 }
 
