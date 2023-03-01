@@ -3,7 +3,6 @@ module github.com/efucloud/common
 go 1.18
 
 require (
-	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/emicklei/go-restful/v3 v3.10.1
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-playground/locales v0.14.1

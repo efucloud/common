@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/denisbrodbeck/machineid"
 	"github.com/ghodss/yaml"
 	"golang.org/x/crypto/bcrypt"
 	"io"
@@ -36,12 +35,6 @@ import (
 	"strconv"
 	"strings"
 )
-
-func GetMachineID(app string) string {
-	id, _ := machineid.ProtectedID(app)
-	klog.Infof("generate app: %s machine id: %s", app, id)
-	return id
-}
 
 func GetAllFiles(dirPath string) (dirs []string, files []string, err error) {
 	fs, err := ioutil.ReadDir(dirPath)
