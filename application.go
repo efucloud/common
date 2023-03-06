@@ -43,7 +43,6 @@ type ApplicationInfo struct {
 	PhysicalInfo *PhysicalInfo `json:"physicalInfo,omitempty"`
 	Alert        string        `json:"alert,omitempty"`
 	Error        string        `json:"error,omitempty"`
-	Data         string        `json:"data"`
 	Time         time.Time     `json:"time"`
 }
 type MachineInformation struct {
