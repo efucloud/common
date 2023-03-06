@@ -47,7 +47,7 @@ func GenerateRASPrivateAndPublicKeys() (privateKey, publicKey []byte, err error)
 	return privateKey, publicKey, nil
 }
 
-func (s *RsaSecurity) PublicKeyEncrypt(input []byte) (encryptedBlockBytes []byte, err error) {
+func (s *RsaSecurity) Encrypt(input []byte) (encryptedBlockBytes []byte, err error) {
 	msgLen := len(input)
 	h := sha256.New()
 	rng := rand.Reader
@@ -70,7 +70,7 @@ func (s *RsaSecurity) PublicKeyEncrypt(input []byte) (encryptedBlockBytes []byte
 	return encryptedBytes, nil
 }
 
-func (s *RsaSecurity) PrivateKeyDecrypt(input []byte) (decryptedBytes []byte, err error) {
+func (s *RsaSecurity) Decrypt(input []byte) (decryptedBytes []byte, err error) {
 	msgLen := len(input)
 	step := s.privateKey.PublicKey.Size()
 	h := sha256.New()
@@ -89,4 +89,56 @@ func (s *RsaSecurity) PrivateKeyDecrypt(input []byte) (decryptedBytes []byte, er
 	}
 
 	return decryptedBytes, nil
+}
+func DecryptData(private, input []byte) (decryptedBytes []byte, err error) {
+	var privateKey *rsa.PrivateKey
+	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(private)
+	if err != nil {
+		return nil, err
+	}
+	msgLen := len(input)
+	step := privateKey.PublicKey.Size()
+	h := sha256.New()
+	rng := rand.Reader
+	label := []byte("efucloud-encrypt")
+	for start := 0; start < msgLen; start += step {
+		finish := start + step
+		if finish > msgLen {
+			finish = msgLen
+		}
+		decryptedBlockBytes, err := rsa.DecryptOAEP(h, rng, privateKey, input[start:finish], label)
+		if err != nil {
+			return nil, err
+		}
+		decryptedBytes = append(decryptedBytes, decryptedBlockBytes...)
+	}
+
+	return decryptedBytes, nil
+}
+
+func EncryptData(public, input []byte) (encryptedBytes []byte, err error) {
+	var publicKey *rsa.PublicKey
+	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(public)
+	if err != nil {
+		return nil, err
+	}
+	msgLen := len(input)
+	h := sha256.New()
+	rng := rand.Reader
+	label := []byte("efucloud-encrypt")
+	step := publicKey.Size() - 2*h.Size() - 2
+	for start := 0; start < msgLen; start += step {
+		finish := start + step
+		if finish > msgLen {
+			finish = msgLen
+		}
+		encryptedBlockBytes, err := rsa.EncryptOAEP(h, rng, publicKey, input[start:finish], label)
+		if err != nil {
+			return nil, err
+		}
+
+		encryptedBytes = append(encryptedBytes, encryptedBlockBytes...)
+	}
+
+	return encryptedBytes, nil
 }

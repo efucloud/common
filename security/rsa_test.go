@@ -12,11 +12,11 @@ func TestRSA(t *testing.T) {
 		t.Fatal(err)
 	}
 	data := "this is rsa test raw data"
-	encryptData, err := Rsa.PublicKeyEncrypt([]byte(data))
+	encryptData, err := Rsa.Encrypt([]byte(data))
 	if err != nil {
 		t.Fatal(err)
 	}
-	decryptData, err := Rsa.PrivateKeyDecrypt(encryptData)
+	decryptData, err := Rsa.Decrypt(encryptData)
 	if err != nil {
 		t.Fatal(err)
 	}
