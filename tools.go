@@ -117,7 +117,16 @@ func MD5V(str string) string {
 	h.Write([]byte(str))
 	return hex.EncodeToString(h.Sum(nil))
 }
-func KeyInArray(key string, arrays []string) (exist bool) {
+func StringKeyInArray(key string, arrays []string) (exist bool) {
+	for _, v := range arrays {
+		if key == v {
+			exist = true
+			return
+		}
+	}
+	return
+}
+func UintKeyInArray(key uint, arrays []uint) (exist bool) {
 	for _, v := range arrays {
 		if key == v {
 			exist = true
