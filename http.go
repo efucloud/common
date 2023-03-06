@@ -36,20 +36,6 @@ import (
 	"time"
 )
 
-const DefaultOrder = "id desc"
-const DefaultPage = 1
-const DefaultPageSize = 20
-const (
-	QueryTypeEqual       = "eq"
-	QueryTypeLike        = "like"
-	QueryTypeIn          = "in"
-	ParamTypeString      = "string"
-	ParamTypeNumber      = "integer"
-	ParamTypeBool        = "bool"
-	ParamTypeStringSlice = "stringSlice"
-	ParamTypeNumberSlice = "numberSlice"
-)
-
 type ApiInfo struct {
 	Tag         string
 	Description string

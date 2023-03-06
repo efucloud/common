@@ -33,11 +33,6 @@ import (
 	"path"
 )
 
-const (
-	I18nZH = "zh"
-	I18nEN = "en"
-)
-
 func GetLanguageFromCtx(ctx context.Context, reqAttributeKey string) (lang string) {
 	lan := ctx.Value(reqAttributeKey)
 	if lan != nil {

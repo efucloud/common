@@ -22,12 +22,17 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var dns1123Reg *regexp.Regexp
 
 func init() {
 	dns1123Reg = regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])?`)
+}
+func ValidateTime(fl validator.FieldLevel) bool {
+	_, err := time.Parse(TimeFormat, fl.Field().String())
+	return err == nil
 }
 func ValidateDNS1123(fl validator.FieldLevel) bool {
 	return dns1123Reg.MatchString(fl.Field().String())

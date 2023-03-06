@@ -16,12 +16,21 @@ limitations under the License.
 
 package common
 
-var WhiteList = map[string]string{}
-
-func init() {
-	WhiteList = make(map[string]string)
-	WhiteList["3171BCDA-B314-5D58-9B7A-5A791CA9EFD1"] = "cloudy"
-	WhiteList["63a9b468c7434f0d9035285aa0d43f2b"] = "aliyun"
-	WhiteList["290B530A-97EF-56CE-A0F8-991B5EF4CFBD"] = "wenxiang"
-	WhiteList["779E8AEF-2908-5A1C-8D92-61534116ADA4"] = "wenxiang"
-}
+const DefaultOrder = "id desc"
+const DefaultPage = 1
+const DefaultPageSize = 20
+const (
+	QueryTypeEqual       = "eq"
+	QueryTypeLike        = "like"
+	QueryTypeIn          = "in"
+	ParamTypeString      = "string"
+	ParamTypeNumber      = "integer"
+	ParamTypeBool        = "bool"
+	ParamTypeStringSlice = "stringSlice"
+	ParamTypeNumberSlice = "numberSlice"
+)
+const (
+	I18nZH = "zh"
+	I18nEN = "en"
+)
+const TimeFormat = "2006-01-02 15:04:05"
