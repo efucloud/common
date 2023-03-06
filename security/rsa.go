@@ -66,7 +66,6 @@ func (s *RsaSecurity) Encrypt(input []byte) (encryptedBlockBytes []byte, err err
 
 		encryptedBytes = append(encryptedBytes, encryptedBlockBytes...)
 	}
-
 	return encryptedBytes, nil
 }
 
