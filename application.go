@@ -32,6 +32,7 @@ func (receiver K8sTokenPayload) Valid() error {
 }
 
 type ApplicationInfo struct {
+	Application  string        `json:"application"`
 	GoVersion    string        `json:"goVersion"`
 	Commit       string        `json:"commit"`
 	BuildDate    string        `json:"buildDate"`
