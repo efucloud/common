@@ -46,7 +46,7 @@ type ApplicationInfo struct {
 	Error        string            `json:"error,omitempty"`
 	Time         time.Time         `json:"time"`
 	Data         string            `json:"data"`
-	WhiteList    map[string]string `json:"whiteList"`
+	Extend       map[string]string `json:"extend"`
 }
 type MachineInformation struct {
 	OS         string          `json:"os"`
