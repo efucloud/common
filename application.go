@@ -32,21 +32,21 @@ func (receiver K8sTokenPayload) Valid() error {
 }
 
 type ApplicationInfo struct {
-	Application  string        `json:"application"`
-	GoVersion    string        `json:"goVersion"`
-	Commit       string        `json:"commit"`
-	BuildDate    string        `json:"buildDate"`
-	K8sVersion   *K8sVersion   `json:"k8SVersion,omitempty"`
-	Namespace    string        `json:"namespace,omitempty"`
-	OS           string        `json:"os"`
-	Arch         string        `json:"arch"`
-	CpuCores     int           `json:"cpuCores"`
-	PhysicalInfo *PhysicalInfo `json:"physicalInfo,omitempty"`
-	Alert        string        `json:"alert,omitempty"`
-	Error        string        `json:"error,omitempty"`
-	Time         time.Time     `json:"time"`
-	Data         string        `json:"data"`
-	WhiteList    bool          `json:"whiteList"`
+	Application  string            `json:"application"`
+	GoVersion    string            `json:"goVersion"`
+	Commit       string            `json:"commit"`
+	BuildDate    string            `json:"buildDate"`
+	K8sVersion   *K8sVersion       `json:"k8SVersion,omitempty"`
+	Namespace    string            `json:"namespace,omitempty"`
+	OS           string            `json:"os"`
+	Arch         string            `json:"arch"`
+	CpuCores     int               `json:"cpuCores"`
+	PhysicalInfo *PhysicalInfo     `json:"physicalInfo,omitempty"`
+	Alert        string            `json:"alert,omitempty"`
+	Error        string            `json:"error,omitempty"`
+	Time         time.Time         `json:"time"`
+	Data         string            `json:"data"`
+	WhiteList    map[string]string `json:"whiteList"`
 }
 type MachineInformation struct {
 	OS         string          `json:"os"`
