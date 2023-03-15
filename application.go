@@ -37,7 +37,6 @@ type ApplicationInfo struct {
 	Commit       string            `json:"commit"`
 	BuildDate    string            `json:"buildDate"`
 	K8sVersion   *K8sVersion       `json:"k8SVersion,omitempty"`
-	Namespace    string            `json:"namespace,omitempty"`
 	OS           string            `json:"os"`
 	Arch         string            `json:"arch"`
 	CpuCores     int               `json:"cpuCores"`
@@ -68,6 +67,7 @@ type KubernetesInfo struct {
 	Version   *K8sVersion `json:"version"`
 }
 type K8sVersion struct {
+	Namespace    string    `json:"namespace"`
 	Major        string    `json:"major"`
 	Minor        string    `json:"minor"`
 	GitVersion   string    `json:"gitVersion"`
