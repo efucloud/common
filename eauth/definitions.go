@@ -62,7 +62,7 @@ type UserInfo struct {
 }
 
 type ApplicationSyncAccountInfo struct {
-	AuthId           uint                   `json:"authId" yaml:"authId"`
+	EAuthID          uint                   `json:"eAuthId" yaml:"eAuthId"`
 	Organization     string                 `json:"organization" validate:"required"` // 组织编码
 	Username         string                 `json:"username" validate:"dns1123"`      // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成
 	Nickname         string                 `json:"nickname"`                         // 昵称，如中文名
@@ -77,7 +77,7 @@ type ApplicationSyncAccountInfo struct {
 	Groups           []string               `json:"groups" yaml:"groups"`
 }
 type AccountClaims struct {
-	AccountID    uint     `json:"accountId" `
+	EAuthID      uint     `json:"eAuthId"`
 	Org          string   `json:"org"`
 	AuthProvider string   `json:"authProvider"`
 	Username     string   `json:"username"` // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成

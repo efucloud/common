@@ -46,6 +46,7 @@ type ApplicationInfo struct {
 	Error        string        `json:"error,omitempty"`
 	Time         time.Time     `json:"time"`
 	Data         string        `json:"data"`
+	WhiteList    bool          `json:"whiteList"`
 }
 type MachineInformation struct {
 	OS         string          `json:"os"`
