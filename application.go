@@ -32,20 +32,20 @@ func (receiver K8sTokenPayload) Valid() error {
 }
 
 type ApplicationInfo struct {
-	Application  string            `json:"application"`
-	GoVersion    string            `json:"goVersion"`
-	Commit       string            `json:"commit"`
-	BuildDate    string            `json:"buildDate"`
-	K8sVersion   *K8sVersion       `json:"k8SVersion,omitempty"`
-	OS           string            `json:"os"`
-	Arch         string            `json:"arch"`
-	CpuCores     int               `json:"cpuCores"`
-	PhysicalInfo *PhysicalInfo     `json:"physicalInfo,omitempty"`
-	Alert        string            `json:"alert,omitempty"`
-	Error        string            `json:"error,omitempty"`
-	Time         time.Time         `json:"time"`
-	Data         string            `json:"data"`
-	Extend       map[string]string `json:"extend"`
+	Application    string            `json:"application"`
+	GoVersion      string            `json:"goVersion"`
+	Commit         string            `json:"commit"`
+	BuildDate      string            `json:"buildDate"`
+	KubernetesInfo *K8sVersion       `json:"kubernetesInfo,omitempty"`
+	OS             string            `json:"os"`
+	Arch           string            `json:"arch"`
+	CpuCores       int               `json:"cpuCores"`
+	PhysicalInfo   *PhysicalInfo     `json:"physicalInfo,omitempty"`
+	Alert          string            `json:"alert,omitempty"`
+	Error          string            `json:"error,omitempty"`
+	Time           time.Time         `json:"time"`
+	Data           string            `json:"data"`
+	Extend         map[string]string `json:"extend"`
 }
 type MachineInformation struct {
 	OS         string          `json:"os"`
