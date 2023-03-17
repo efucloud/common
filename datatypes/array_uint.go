@@ -21,15 +21,33 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 type ArrayUint []uint
 
-func (ArrayUint) GormDataType() string {
-	return "json"
+// GormDataType gorm common data type
+func (m ArrayUint) GormDataType() string {
+	return "jsonmap"
 }
 
-//Scan 实现 sql.Scanner 接口，Scan 将 value 扫描至 Jsonb
+// GormDBDataType gorm db data type
+func (ArrayUint) GormDBDataType(db *gorm.DB, field *schema.Field) string {
+	switch db.Dialector.Name() {
+	case "sqlite":
+		return "JSON"
+	case "mysql":
+		return "json"
+	case "postgres":
+		return "JSONB"
+	case "sqlserver":
+		return "NVARCHAR(MAX)"
+	}
+	return ""
+}
+
+// Scan 实现 sql.Scanner 接口，Scan 将 value 扫描至 Jsonb
 func (ar *ArrayUint) Scan(value interface{}) error {
 	byteValue, ok := value.([]byte)
 	if !ok {
@@ -39,7 +57,7 @@ func (ar *ArrayUint) Scan(value interface{}) error {
 	return err
 }
 
-//Value 实现 driver.Valuer 接口，Value 返回 json value
+// Value 实现 driver.Valuer 接口，Value 返回 json value
 func (ar ArrayUint) Value() (driver.Value, error) {
 	re, err := json.Marshal(ar)
 	return re, err

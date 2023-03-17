@@ -76,7 +76,6 @@ func (m JSONMap) MarshalJSON() ([]byte, error) {
 func (m *JSONMap) UnmarshalJSON(b []byte) error {
 	t := map[string]string{}
 	err := json.Unmarshal(b, &t)
-	*m = JSONMap(t)
 	return err
 }
 
