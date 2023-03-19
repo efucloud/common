@@ -59,6 +59,7 @@ type UserInfo struct {
 	Category         string                 `json:"category"`
 	Phone            string                 `json:"phone"`
 	ID               uint                   `json:"id"`
+	Enable           bool                   `json:"enable"`
 }
 
 type ApplicationSyncAccountInfo struct {
