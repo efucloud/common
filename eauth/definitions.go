@@ -40,7 +40,8 @@ type OIDCConfig struct {
 	UsernamePrefix string `json:"usernamePrefix" yaml:"usernamePrefix"`
 	// token校验的公钥信息，若不配置，应用需要根据Issuer+/.well-known/openid-configuration去获取
 	// 若以gitlab为例https://gitlab.com/.well-known/openid-configuration
-	Certificate string `json:"certificate" yaml:"certificate"`
+	Certificate string   `json:"certificate" yaml:"certificate"`
+	Scopes      []string `json:"scopes" yaml:"scopes"`
 }
 type UserInfo struct {
 	Subject          string                 `json:"sub"`
