@@ -105,3 +105,10 @@ func ValidateTransCtx(unTrans *ut.UniversalTranslator, ctxLangKey string, valida
 
 	return removeTopStruct(errs.Translate(trans))
 }
+
+type ErrorData struct {
+	Lang  string `json:"lang"`  // 
+	Code  int    `json:"code"`  //
+	Error error  `json:"error"` //
+	Msg   string `json:"msg"`   //
+}
