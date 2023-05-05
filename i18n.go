@@ -107,8 +107,8 @@ func ValidateTransCtx(unTrans *ut.UniversalTranslator, ctxLangKey string, valida
 }
 
 type ErrorData struct {
-	Lang  string `json:"lang"`  // 
-	Code  int    `json:"code"`  //
-	Error error  `json:"error"` //
-	Msg   string `json:"msg"`   //
+	Lang         string `json:"lang"`         // 语言
+	ResponseCode int    `json:"responseCode"` // 响应头编码
+	Error        error  `json:"error"`        // 错误信息
+	MsgCode      string `json:"msgCode"`      // i18n 信息编码
 }

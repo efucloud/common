@@ -25,10 +25,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/emicklei/go-restful/v3"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/net/http2"
-	"k8s.io/klog/v2"
 	"net"
 	"net/http"
 	"net/url"
@@ -133,21 +131,23 @@ func ResponseAuthRedirect(resp *restful.Response, bundle *i18n.Bundle, lang, mes
 	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
 	_ = resp.WriteAsJson(body)
 }
-func ResponseErrorMessage(resp *restful.Response, bundle *i18n.Bundle, code int, lang, message, detail string, ctx context.Context) {
-	resp.WriteHeader(code)
+func ResponseErrorMessage(resp *restful.Response, bundle *i18n.Bundle, detail ErrorData, ctx context.Context) {
+	if detail.ResponseCode == 0 {
+		detail.ResponseCode = http.StatusInternalServerError
+	}
+	resp.WriteHeader(detail.ResponseCode)
 	var body ResponseError
-	body.Message = message
-	body.Detail = detail
-	switch code {
+	body.Message = detail.MsgCode
+	body.Detail = fmt.Sprintf("%v", detail.Error)
+	switch detail.ResponseCode {
 	case http.StatusUnauthorized:
-		body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
+		body.Alert, _ = GetLocaleMessage(bundle, nil, detail.Lang, "statusUnauthorized")
 	case http.StatusBadRequest:
-		body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusBadRequest")
+		body.Alert, _ = GetLocaleMessage(bundle, nil, detail.Lang, "statusBadRequest")
 	case http.StatusForbidden:
-		body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusForbidden")
-	case http.StatusInternalServerError:
-		body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusInternalServerError")
-
+		body.Alert, _ = GetLocaleMessage(bundle, nil, detail.Lang, "statusForbidden")
+	default:
+		body.Alert, _ = GetLocaleMessage(bundle, nil, detail.Lang, detail.MsgCode)
 	}
 	_ = resp.WriteAsJson(body)
 }
