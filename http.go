@@ -140,7 +140,7 @@ func ResponseErrorMessage(resp *restful.Response, bundle *i18n.Bundle, detail Er
 	resp.WriteHeader(detail.ResponseCode)
 	var body ResponseError
 	body.Message = detail.MsgCode
-	body.Detail = fmt.Sprintf("%v", detail.Error)
+	body.Detail = fmt.Sprintf("%v", detail.Err)
 	switch detail.ResponseCode {
 	case http.StatusUnauthorized:
 		body.Alert, _ = GetLocaleMessage(bundle, nil, detail.Lang, "statusUnauthorized")

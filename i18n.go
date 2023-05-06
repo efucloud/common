@@ -19,17 +19,15 @@ package common
 import (
 	"context"
 	"embed"
-	"github.com/emicklei/go-restful/v3"
+	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
-	"k8s.io/klog/v2"
 	"path"
 )
 
@@ -111,4 +109,13 @@ type ErrorData struct {
 	ResponseCode int    `json:"responseCode"` // 响应头编码
 	Err          error  `json:"error"`        // 错误信息
 	MsgCode      string `json:"msgCode"`      // i18n 信息编码
+}
+
+func (ed ErrorData) IsNil() bool {
+	return ed.Err == nil
+}
+
+func (ed ErrorData) String() string {
+	return fmt.Sprintf("Lang: %s, ResponseCode: %d, MsgCode: %s, Error; %v",
+		ed.Lang, ed.ResponseCode, ed.MsgCode, ed.Err)
 }
