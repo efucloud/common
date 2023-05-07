@@ -108,10 +108,11 @@ func ValidateTransCtx(unTrans *ut.UniversalTranslator, ctxLangKey string, valida
 }
 
 type ErrorData struct {
-	Lang         string `json:"lang"`         // 语言
-	ResponseCode int    `json:"responseCode"` // 响应头编码
-	Err          error  `json:"error"`        // 错误信息
-	MsgCode      string `json:"msgCode"`      // i18n 信息编码
+	Lang         string                 `json:"lang"`         // 语言
+	ResponseCode int                    `json:"responseCode"` // 响应头编码
+	Err          error                  `json:"error"`        // 错误信息
+	MsgCode      string                 `json:"msgCode"`      // i18n 信息编码
+	Params       map[string]interface{} `json:"params"`       // 需要渲染的参数
 }
 
 func (ed ErrorData) IsNil() bool {
