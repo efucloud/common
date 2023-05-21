@@ -25,6 +25,8 @@ func init() {
 	WhiteList["290B530A-97EF-56CE-A0F8-991B5EF4CFBD"] = "wenxiang"
 	WhiteList["779E8AEF-2908-5A1C-8D92-61534116ADA4"] = "wenxiang"
 }
+
+// GetWhiteList 后期从服务器获取，并缓存
 func GetWhiteList(serial string) (user string) {
 	user, _ = WhiteList[serial]
 	return user
