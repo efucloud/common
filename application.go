@@ -49,8 +49,6 @@ type ApplicationInfo struct {
 	Developer      string            `json:"developer,omitempty"` //
 	MachineID      string            `json:"machineId,omitempty"` //
 }
-type Docker struct {
-}
 type MachineInformation struct {
 	OS         string          `json:"os"`
 	Arch       string          `json:"arch"`
