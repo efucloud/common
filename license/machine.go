@@ -85,7 +85,7 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 				applicationInfo.Error = err.Error()
 				return
 			}
-			applicationInfo.Data = common.MD5VByte(token)
+			applicationInfo.MachineID = common.MD5VByte(token)
 		} else {
 			applicationInfo.Error = err.Error()
 			return
@@ -119,7 +119,7 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 			applicationInfo.PhysicalInfo = new(common.PhysicalInfo)
 			info.Physical.MachineID, err = machineid.ProtectedID(appName)
 			applicationInfo.PhysicalInfo = info.Physical
-			applicationInfo.Data = info.Physical.MachineID
+			applicationInfo.MachineID = info.Physical.MachineID
 		}
 	}
 
