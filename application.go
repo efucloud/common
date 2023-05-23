@@ -41,12 +41,13 @@ type ApplicationInfo struct {
 	Arch           string            `json:"arch"`
 	CpuCores       int               `json:"cpuCores"`
 	PhysicalInfo   *PhysicalInfo     `json:"physicalInfo,omitempty"`
-	DockerInfo     *Docker           `json:"dockerInfo,omitempty"`
 	Alert          string            `json:"alert,omitempty"`
 	Error          string            `json:"error,omitempty"`
 	Time           time.Time         `json:"time"`
 	Data           string            `json:"data"`
-	Extend         map[string]string `json:"extend"`
+	Extend         map[string]string `json:"extend,omitempty"`
+	Developer      string            `json:"developer,omitempty"` //
+	MachineID      string            `json:"machineId,omitempty"` //
 }
 type Docker struct {
 }
