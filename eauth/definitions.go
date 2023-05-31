@@ -77,6 +77,7 @@ type ApplicationSyncAccountInfo struct {
 	Email            string                 `json:"email" yaml:"email"`
 	Phone            string                 `json:"phone" yaml:"phone"`
 	Groups           []string               `json:"groups" yaml:"groups"`
+	Workspaces       []string               `json:"workspaces" yaml:"workspaces"` // 工作空间
 }
 type AccountClaims struct {
 	EAuthID      uint     `json:"eAuthId"`
@@ -89,6 +90,7 @@ type AccountClaims struct {
 	Email        string   `json:"email"`
 	Phone        string   `json:"phone"`
 	Groups       []string `json:"groups"`
+	Workspaces   []string `json:"workspaces" yaml:"workspaces"` // 工作空间
 	AppCode      string   `json:"appCode"`
 	AppClientID  string   `json:"appClientId"`
 	AppOwner     bool     `json:"appOwner"`

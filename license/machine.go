@@ -85,7 +85,7 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 				applicationInfo.Error = err.Error()
 				return
 			}
-			applicationInfo.MachineID = common.MD5VByte(token)
+			applicationInfo.MachineID = common.MD5VByte(ca)
 		} else {
 			applicationInfo.Error = err.Error()
 			return
