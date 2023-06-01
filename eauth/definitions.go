@@ -133,6 +133,11 @@ type RefreshToken struct {
 }
 
 type AccountSync struct {
-	CronJob string `json:"cronJob"`
-	Address string `json:"address"`
+	CronJob string `json:"cronJob" yaml:"cronJob"` //
+	Address string `json:"address" yaml:"address"` //
+}
+type WorkspaceSync struct {
+	CronJbo    string   `json:"cronJbo" yaml:"cronJbo"`       //
+	Address    string   `json:"address" yaml:"address"`       //
+	Workspaces []string `json:"workspaces" yaml:"workspaces"` //
 }
