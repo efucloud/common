@@ -80,21 +80,22 @@ type ApplicationSyncAccountInfo struct {
 	Workspaces       []string               `json:"workspaces" yaml:"workspaces"` // 工作空间
 }
 type AccountClaims struct {
-	EAuthID      uint     `json:"eAuthId"`
-	Org          string   `json:"org"`
-	AuthProvider string   `json:"authProvider"`
-	Username     string   `json:"username"` // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成
-	Nickname     string   `json:"nickname"` // 昵称，如中文名
-	OrgRole      string   `json:"orgRole"`  // 组织角色
-	Nonce        string   `json:"nonce"`
-	Email        string   `json:"email"`
-	Phone        string   `json:"phone"`
-	Groups       []string `json:"groups"`
-	Workspaces   []string `json:"workspaces" yaml:"workspaces"` // 工作空间
-	AppCode      string   `json:"appCode"`
-	AppClientID  string   `json:"appClientId"`
-	AppOwner     bool     `json:"appOwner"`
-	Category     string   `json:"category"`
+	EAuthID        uint              `json:"eAuthId"`
+	Org            string            `json:"org"`
+	AuthProvider   string            `json:"authProvider"`
+	Username       string            `json:"username"` // 用户名 组织内唯一必须由DNS-1123标签格式的单元组成
+	Nickname       string            `json:"nickname"` // 昵称，如中文名
+	OrgRole        string            `json:"orgRole"`  // 组织角色
+	Nonce          string            `json:"nonce"`
+	Email          string            `json:"email"`
+	Phone          string            `json:"phone"`
+	Groups         []string          `json:"groups"`
+	Workspaces     []string          `json:"workspaces"`     // 工作空间
+	WorkspacesRole map[string]string `json:"workspacesRole"` // 工作空间角色
+	AppCode        string            `json:"appCode"`
+	AppClientID    string            `json:"appClientId"`
+	AppOwner       bool              `json:"appOwner"`
+	Category       string            `json:"category"`
 	jwt.RegisteredClaims
 }
 
