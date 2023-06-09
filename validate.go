@@ -98,3 +98,15 @@ func (f FiledValidFailed) LocaleMap(localeMap map[string]string) (result map[str
 	}
 	return result
 }
+func CodeValidate(fl validator.FieldLevel) bool {
+	alphaRegex := regexp.MustCompile("^[a-z-]+$")
+	code := fl.Field().String()
+	if len(code) == 0 {
+		return false
+	}
+	allows := []string{"company", "public", "top", "global", "default", "org", "organization", "system"}
+	if common.StringKeyInArray(fl.Field().String(), allows) {
+		return false
+	}
+	return alphaRegex.MatchString(code)
+}
