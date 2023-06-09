@@ -105,7 +105,7 @@ func CodeValidate(fl validator.FieldLevel) bool {
 		return false
 	}
 	allows := []string{"company", "public", "top", "global", "default", "org", "organization", "system"}
-	if common.StringKeyInArray(fl.Field().String(), allows) {
+	if StringKeyInArray(fl.Field().String(), allows) {
 		return false
 	}
 	return alphaRegex.MatchString(code)
