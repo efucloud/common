@@ -41,13 +41,9 @@ const (
 // GetMachineInformation 根据部署来生成机器信息
 func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicationInfo common.ApplicationInfo) {
 	var (
-		info common.MachineInformation
-		ca   []byte
-		err  error
+		ca  []byte
+		err error
 	)
-	info.OS = runtime.GOOS
-	info.Arch = runtime.GOARCH
-	info.CpuCores = runtime.GOMAXPROCS(0)
 	applicationInfo.Application = appName
 	applicationInfo.OS = runtime.GOOS
 	applicationInfo.Arch = runtime.GOARCH
@@ -57,14 +53,12 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 	// 判断是否在k8s集群中运行
 	ca, err = os.ReadFile(path.Join(k8sPath, "ca.crt"))
 	if err == nil {
-		applicationInfo.KubernetesInfo = new(common.K8sVersion)
-		info.Kubernetes = new(common.KubernetesInfo)
-		info.Kubernetes.Version = new(common.K8sVersion)
-		info.Kubernetes.CA = string(ca)
+		applicationInfo.KubernetesInfo = new(common.KubernetesInfo)
+		applicationInfo.KubernetesInfo.Version = new(common.K8sVersion)
+		applicationInfo.KubernetesInfo.CA = string(ca)
 		tP := path.Join(k8sPath, "namespace")
 		if ns, err := os.ReadFile(tP); err == nil {
-			info.Kubernetes.Namespace = string(ns)
-			applicationInfo.KubernetesInfo.Namespace = info.Kubernetes.Namespace
+			applicationInfo.KubernetesInfo.Namespace = string(ns)
 		} else {
 			applicationInfo.Error = err.Error()
 			logger.Errorf("read token from path: %s failed, err: %s", tP, err.Error())
@@ -91,10 +85,10 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 			applicationInfo.Error = err.Error()
 			return
 		}
-		info.Kubernetes.Server = os.Getenv(kubernetesServerAddr)
-		info.Kubernetes.Port = os.Getenv(kubernetesServerPort)
+		applicationInfo.KubernetesInfo.Server = os.Getenv(kubernetesServerAddr)
+		applicationInfo.KubernetesInfo.Port = os.Getenv(kubernetesServerPort)
 		//获取k8s版本信息
-		verAddr := fmt.Sprintf("https://%s:%s/version", info.Kubernetes.Server, info.Kubernetes.Port)
+		verAddr := fmt.Sprintf("https://%s:%s/version", applicationInfo.KubernetesInfo.Server, applicationInfo.KubernetesInfo.Port)
 		logger.Infof("get kubernetes version from: %s", verAddr)
 		headers := make(map[string]string)
 		headers["Authorization"] = "Bearer " + tokenStr
@@ -110,7 +104,8 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 					applicationInfo.Error = err.Error()
 					return
 				} else {
-					info.Kubernetes.Version = &ver
+					applicationInfo.KubernetesInfo.Version = &ver
+
 				}
 			} else {
 				logger.Errorf("get kubernetes version response: %s", string(body))
@@ -129,11 +124,8 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 				applicationInfo.Error = fmt.Sprintf("application not support running in docker")
 			}
 		} else {
-			info.Physical = new(common.PhysicalInfo)
 			applicationInfo.PhysicalInfo = new(common.PhysicalInfo)
-			info.Physical.MachineID, err = machineid.ProtectedID(appName)
-			applicationInfo.PhysicalInfo = info.Physical
-			applicationInfo.MachineID = info.Physical.MachineID
+			applicationInfo.PhysicalInfo.MachineID, err = machineid.ProtectedID(appName)
 		}
 	}
 

@@ -42,7 +42,7 @@ type ApplicationInfo struct {
 	GoVersion      string            `json:"goVersion"`
 	Commit         string            `json:"commit"`
 	BuildDate      string            `json:"buildDate"`
-	KubernetesInfo *K8sVersion       `json:"kubernetesInfo,omitempty"`
+	KubernetesInfo *KubernetesInfo   `json:"kubernetesInfo,omitempty"`
 	OS             string            `json:"os"`
 	Arch           string            `json:"arch"`
 	CpuCores       int               `json:"cpuCores"`
@@ -54,13 +54,6 @@ type ApplicationInfo struct {
 	Extend         map[string]string `json:"extend,omitempty"`
 	Developer      string            `json:"developer,omitempty"` //
 	MachineID      string            `json:"machineId,omitempty"` //
-}
-type MachineInformation struct {
-	OS         string          `json:"os"`
-	Arch       string          `json:"arch"`
-	CpuCores   int             `json:"cpuCores"`
-	Kubernetes *KubernetesInfo `json:"kubernetes"`
-	Physical   *PhysicalInfo   `json:"physical"`
 }
 
 type PhysicalInfo struct {
