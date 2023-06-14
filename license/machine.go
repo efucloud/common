@@ -99,7 +99,9 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 		headers := make(map[string]string)
 		headers["Authorization"] = "Bearer " + tokenStr
 		if response, err := common.Request(http.MethodGet, verAddr, headers, nil, nil); err == nil {
-			body, _ := io.ReadAll(response.Body)
+			body, err := io.ReadAll(response.Body)
+			logger.Info(err)
+			logger.Infof("get kubernetes version response: %s", string(body))
 			if response.StatusCode == http.StatusOK {
 				var ver common.K8sVersion
 				err = json.Unmarshal(body, &ver)
@@ -111,7 +113,7 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 					info.Kubernetes.Version = &ver
 				}
 			} else {
-				logger.Errorf("get kubernetes version response code: %s", string(body))
+				logger.Errorf("get kubernetes version response: %s", string(body))
 			}
 		} else {
 			logger.Error(err)
