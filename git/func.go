@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/efucloud/common"
 	"github.com/ghodss/yaml"
+	"go.uber.org/zap"
 	"gopkg.in/ini.v1"
 	"k8s.io/klog/v2"
 	"os"
@@ -29,17 +30,17 @@ import (
 	"time"
 )
 
-func GetGitRepoInformation() (result *RepositoryInformation) {
+func GetGitRepoInformation(logger *zap.SugaredLogger) (result *RepositoryInformation) {
 
 	// 从.git/HEAD中读取当前的分支
 	curDir, err := os.Getwd()
 	if err != nil {
-		klog.Errorf("get current work dir failed, err; %s", err.Error())
+		logger.Errorf("get current work dir failed, err; %s", err.Error())
 		return
 	}
 	gitPath := path.Join(curDir, ".git")
 	if !common.PathExists(gitPath) {
-		klog.Errorf("%s not exist", gitPath)
+		logger.Errorf("%s not exist", gitPath)
 		return
 	}
 	result = &RepositoryInformation{}
@@ -53,37 +54,37 @@ func GetGitRepoInformation() (result *RepositoryInformation) {
 	}
 	result.CommitInfo, result.Author, result.Email, result.Commit, result.Time, result.Timestamp, err =
 		getCommitLog(path.Join(gitPath, "logs", result.Ref), result.Hash)
-	result.Remote, result.Url = getRemoteAndUrl(path.Join(gitPath, "config"), result.Branch)
+	result.Remote, result.Url = getRemoteAndUrl(path.Join(gitPath, "config"), result.Branch, logger)
 	return result
 
 }
-func getRemoteAndUrl(p, branch string) (remote, url string) {
+func getRemoteAndUrl(p, branch string, logger *zap.SugaredLogger) (remote, url string) {
 	cfg, err := ini.Load(p)
 	if err != nil {
-		klog.Errorf("load file: %s failed, err: %s", p, err.Error())
+		logger.Errorf("load file: %s failed, err: %s", p, err.Error())
 		return
 	}
 	sn := fmt.Sprintf(`branch "%s"`, branch)
 	section, err := cfg.GetSection(sn)
 	if err != nil {
-		klog.Errorf("get section: %s failed, err: %s", sn, err.Error())
+		logger.Errorf("get section: %s failed, err: %s", sn, err.Error())
 		return
 	}
 	key, err := section.GetKey("remote")
 	if err != nil {
-		klog.Errorf("get section: %s key: remote failed, err: %s", sn, err.Error())
+		logger.Errorf("get section: %s key: remote failed, err: %s", sn, err.Error())
 		return
 	}
 	remote = key.Value()
 	remoteSn := fmt.Sprintf(`remote "%s"`, remote)
 	section, err = cfg.GetSection(remoteSn)
 	if err != nil {
-		klog.Errorf("get section: %s failed, err: %s", remoteSn, err.Error())
+		logger.Errorf("get section: %s failed, err: %s", remoteSn, err.Error())
 		return
 	}
 	key, err = section.GetKey("url")
 	if err != nil {
-		klog.Errorf("get section: %s key: remote failed, err: %s", sn, err.Error())
+		logger.Errorf("get section: %s key: remote failed, err: %s", sn, err.Error())
 		return
 	}
 	url = key.Value()

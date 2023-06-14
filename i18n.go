@@ -29,8 +29,8 @@ import (
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	zh_translations "github.com/go-playground/validator/v10/translations/zh"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"go.uber.org/zap"
 	"golang.org/x/text/language"
-	"k8s.io/klog/v2"
 	"path"
 )
 
@@ -49,18 +49,18 @@ func GetLanguageFromReq(req *restful.Request, reqAttributeKey string) (lang stri
 	}
 	return lang
 }
-func I18nInit(i18nFiles embed.FS) (bundle *i18n.Bundle, universalTranslator *ut.UniversalTranslator) {
+func I18nInit(i18nFiles embed.FS, logger *zap.SugaredLogger) (bundle *i18n.Bundle, universalTranslator *ut.UniversalTranslator) {
 	// todo add other language
 	universalTranslator = ut.New(en.New(), zh.New())
 	bundle = i18n.NewBundle(language.Chinese)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 	_, err := bundle.LoadMessageFileFS(i18nFiles, path.Join("locales", "en.yaml"))
 	if err != nil {
-		klog.Fatalf("load i18n message file failed, err: %s", err.Error())
+		logger.Fatalf("load i18n message file failed, err: %s", err.Error())
 	}
 	_, err = bundle.LoadMessageFileFS(i18nFiles, path.Join("locales", "zh.yaml"))
 	if err != nil {
-		klog.Fatalf("load i18n message file failed, err: %s", err.Error())
+		logger.Fatalf("load i18n message file failed, err: %s", err.Error())
 	}
 	return
 }
