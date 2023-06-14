@@ -22,7 +22,7 @@ import (
 	"github.com/denisbrodbeck/machineid"
 	"github.com/efucloud/common"
 	"github.com/golang-jwt/jwt/v5"
-	"k8s.io/klog/v2"
+	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"path"
@@ -38,7 +38,7 @@ const (
 )
 
 // GetMachineInformation 根据部署来生成机器信息
-func GetMachineInformation(appName string) (applicationInfo common.ApplicationInfo) {
+func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicationInfo common.ApplicationInfo) {
 	var (
 		info common.MachineInformation
 		ca   []byte
@@ -58,13 +58,15 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 	if err == nil {
 		applicationInfo.KubernetesInfo = new(common.K8sVersion)
 		info.Kubernetes = new(common.KubernetesInfo)
+		info.Kubernetes.Version = new(common.K8sVersion)
 		info.Kubernetes.CA = string(ca)
-		if ns, err := os.ReadFile(path.Join(k8sPath, "namespace")); err == nil {
+		tP := path.Join(k8sPath, "namespace")
+		if ns, err := os.ReadFile(tP); err == nil {
 			info.Kubernetes.Namespace = string(ns)
 			applicationInfo.KubernetesInfo.Namespace = info.Kubernetes.Namespace
 		} else {
-			klog.Error(err)
 			applicationInfo.Error = err.Error()
+			logger.Errorf("read token from path: %s failed, err: %s", tP, err.Error())
 			return
 		}
 		var k8sTokenPayload *common.K8sTokenPayload
@@ -80,7 +82,7 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 			}
 			applicationInfo.MachineID = common.MD5VByte(ca)
 		} else {
-			klog.Error(err)
+			logger.Errorf("read token from path: %s failed, err: %s", path.Join(k8sPath, "token"), err.Error())
 			applicationInfo.Error = err.Error()
 			return
 		}
@@ -92,16 +94,18 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 			if response.StatusCode == http.StatusOK {
 				err = json.NewDecoder(response.Body).Decode(info.Kubernetes.Version)
 				if err != nil {
+					logger.Error(err)
 					applicationInfo.Error = err.Error()
 					return
 				}
 			}
 		} else {
+			logger.Error(err)
 			applicationInfo.Error = err.Error()
 			return
 		}
 	} else {
-		klog.Infof("current run system is: %s", runtime.GOOS)
+		logger.Infof("current run system is: %s", runtime.GOOS)
 		// 只判断为linux时判断是否docker运行
 		if runtime.GOOS == "linux" {
 			//只要是linux就认为是容器内部
