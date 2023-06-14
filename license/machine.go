@@ -69,25 +69,14 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 		}
 		var k8sTokenPayload *common.K8sTokenPayload
 		if token, err := os.ReadFile(path.Join(k8sPath, "token")); err == nil {
-			if t, err := jwt.ParseWithClaims(string(token), k8sTokenPayload, func(token *jwt.Token) (interface{}, error) {
+			tokenIns, _ := jwt.Parse(string(token), func(t *jwt.Token) (interface{}, error) {
 				return nil, nil
-			}); k8sTokenPayload != nil {
-				if payload, ok := t.Claims.(*common.K8sTokenPayload); ok {
-					if payload.Namespace != applicationInfo.KubernetesInfo.Namespace {
-						applicationInfo.Error = "namespace is not right"
-						return
-					} else if payload.Iss != "kubernetes/serviceaccount" {
-						applicationInfo.Error = "application is nor run in kubernetes"
-						return
-					}
-				} else {
-					applicationInfo.Error = "application is nor run in kubernetes"
-					return
+			})
+			data, _ := json.Marshal(tokenIns)
+			if json.Unmarshal(data, k8sTokenPayload) == nil {
+				if k8sTokenPayload != nil && k8sTokenPayload.Claims != nil && k8sTokenPayload.Claims.KubernetesIo != nil {
+					applicationInfo.KubernetesInfo.Namespace = k8sTokenPayload.Claims.KubernetesIo.Namespace
 				}
-			} else {
-				klog.Error(err)
-				applicationInfo.Error = err.Error()
-				return
 			}
 			applicationInfo.MachineID = common.MD5VByte(ca)
 		} else {

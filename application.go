@@ -17,22 +17,24 @@ limitations under the License.
 package common
 
 import (
-	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
 
-type K8sTokenPayload struct {
-	Iss                string `json:"iss"`
-	Namespace          string `json:"kubernetes.io/serviceaccount/namespace"`
-	SecretName         string `json:"kubernetes.io/serviceaccount/secret.name"`
-	ServiceAccountName string `json:"kubernetes.io/serviceaccount/service-account.name"`
-	ServiceAccountUid  string `json:"kubernetes.io/serviceaccount/service-account.uid"`
-	Sub                string `json:"sub"`
-	jwt.RegisteredClaims
+type K8sTokenClaims struct {
+	Aud          []string                    `json:"aud"`
+	Exp          int                         `json:"exp"`
+	Iat          int                         `json:"iat"`
+	Iss          string                      `json:"iss"`
+	KubernetesIo *K8sTokenClaimsKubernetesIo `json:"kubernetes.io"`
+	Nbf          int                         `json:"nbf"`
+	Sub          string                      `json:"sub"`
 }
-
-func (receiver K8sTokenPayload) Valid() error {
-	return nil
+type K8sTokenClaimsKubernetesIo struct {
+	Namespace string `json:"namespace"`
+	Sub       string `json:"sub"`
+}
+type K8sTokenPayload struct {
+	Claims *K8sTokenClaims `json:"Claims"`
 }
 
 type ApplicationInfo struct {
