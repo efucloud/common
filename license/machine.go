@@ -55,7 +55,7 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 	if err == nil {
 		applicationInfo.KubernetesInfo = new(common.KubernetesInfo)
 		applicationInfo.KubernetesInfo.Version = new(common.K8sVersion)
-		applicationInfo.KubernetesInfo.CA = string(ca)
+		applicationInfo.KubernetesInfo.CA = common.MD5VByte(ca)
 		tP := path.Join(k8sPath, "namespace")
 		if ns, err := os.ReadFile(tP); err == nil {
 			applicationInfo.KubernetesInfo.Namespace = string(ns)

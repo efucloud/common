@@ -43,13 +43,13 @@ type ApplicationInfo struct {
 	Commit         string            `json:"commit"`
 	BuildDate      string            `json:"buildDate"`
 	KubernetesInfo *KubernetesInfo   `json:"kubernetesInfo,omitempty"`
-	OS             string            `json:"os"`
-	Arch           string            `json:"arch"`
-	CpuCores       int               `json:"cpuCores"`
+	OS             string            `json:"os,omitempty"`
+	Arch           string            `json:"arch,omitempty"`
+	CpuCores       int               `json:"cpuCores,omitempty"`
 	PhysicalInfo   *PhysicalInfo     `json:"physicalInfo,omitempty"`
 	Alert          string            `json:"alert,omitempty"`
 	Error          string            `json:"error,omitempty"`
-	Time           time.Time         `json:"time"`
+	Time           time.Time         `json:"time,omitempty"`
 	Data           string            `json:"data,omitempty"`
 	Extend         map[string]string `json:"extend,omitempty"`
 	Developer      string            `json:"developer,omitempty"` //
@@ -79,5 +79,5 @@ type K8sVersion struct {
 	Platform     string    `json:"platform"`
 }
 type Payload struct {
-	Data string `json:"data" description:"加密信息"`
+	Data string `json:"data" description:"信息"`
 }
