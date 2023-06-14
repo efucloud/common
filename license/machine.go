@@ -23,6 +23,7 @@ import (
 	"github.com/efucloud/common"
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -69,9 +70,13 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 			logger.Errorf("read token from path: %s failed, err: %s", tP, err.Error())
 			return
 		}
-		var k8sTokenPayload *common.K8sTokenPayload
+		var (
+			k8sTokenPayload *common.K8sTokenPayload
+			tokenStr        string
+		)
 		if token, err := os.ReadFile(path.Join(k8sPath, "token")); err == nil {
-			tokenIns, _ := jwt.Parse(string(token), func(t *jwt.Token) (interface{}, error) {
+			tokenStr = string(token)
+			tokenIns, _ := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 				return nil, nil
 			})
 			data, _ := json.Marshal(tokenIns)
@@ -90,14 +95,23 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 		info.Kubernetes.Port = os.Getenv(kubernetesServerPort)
 		//获取k8s版本信息
 		verAddr := fmt.Sprintf("https://%s:%s/version", info.Kubernetes.Server, info.Kubernetes.Port)
-		if response, err := common.Request(http.MethodGet, verAddr, nil, nil, nil); err == nil {
+		logger.Infof("get kubernetes version from: %s", verAddr)
+		headers := make(map[string]string)
+		headers["Authorization"] = "Bearer " + tokenStr
+		if response, err := common.Request(http.MethodGet, verAddr, headers, nil, nil); err == nil {
+			body, _ := io.ReadAll(response.Body)
 			if response.StatusCode == http.StatusOK {
-				err = json.NewDecoder(response.Body).Decode(info.Kubernetes.Version)
+				var ver common.K8sVersion
+				err = json.Unmarshal(body, &ver)
 				if err != nil {
 					logger.Error(err)
 					applicationInfo.Error = err.Error()
 					return
+				} else {
+					info.Kubernetes.Version = &ver
 				}
+			} else {
+				logger.Errorf("get kubernetes version response code: %s", string(body))
 			}
 		} else {
 			logger.Error(err)
