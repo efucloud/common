@@ -115,12 +115,54 @@ func DecryptData(private, input []byte) (decryptedBytes []byte, err error) {
 	return decryptedBytes, nil
 }
 
+func DecryptDataByPrivateKey(privateKey *rsa.PrivateKey, input []byte) (decryptedBytes []byte, err error) {
+	msgLen := len(input)
+	step := privateKey.PublicKey.Size()
+	h := sha256.New()
+	rng := rand.Reader
+	label := []byte("efucloud-encrypt")
+	for start := 0; start < msgLen; start += step {
+		finish := start + step
+		if finish > msgLen {
+			finish = msgLen
+		}
+		decryptedBlockBytes, err := rsa.DecryptOAEP(h, rng, privateKey, input[start:finish], label)
+		if err != nil {
+			return nil, err
+		}
+		decryptedBytes = append(decryptedBytes, decryptedBlockBytes...)
+	}
+
+	return decryptedBytes, nil
+}
 func EncryptData(public, input []byte) (encryptedBytes []byte, err error) {
 	var publicKey *rsa.PublicKey
 	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(public)
 	if err != nil {
 		return nil, err
 	}
+	msgLen := len(input)
+	h := sha256.New()
+	rng := rand.Reader
+	label := []byte("efucloud-encrypt")
+	step := publicKey.Size() - 2*h.Size() - 2
+	for start := 0; start < msgLen; start += step {
+		finish := start + step
+		if finish > msgLen {
+			finish = msgLen
+		}
+		encryptedBlockBytes, err := rsa.EncryptOAEP(h, rng, publicKey, input[start:finish], label)
+		if err != nil {
+			return nil, err
+		}
+
+		encryptedBytes = append(encryptedBytes, encryptedBlockBytes...)
+	}
+
+	return encryptedBytes, nil
+}
+
+func EncryptDataByPublicKey(publicKey *rsa.PublicKey, input []byte) (encryptedBytes []byte, err error) {
 	msgLen := len(input)
 	h := sha256.New()
 	rng := rand.Reader
