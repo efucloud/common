@@ -50,7 +50,7 @@ type ApplicationInfo struct {
 	Alert          string            `json:"alert,omitempty"`
 	Error          string            `json:"error,omitempty"`
 	Time           time.Time         `json:"time"`
-	Data           string            `json:"data"`
+	Data           string            `json:"data,omitempty"`
 	Extend         map[string]string `json:"extend,omitempty"`
 	Developer      string            `json:"developer,omitempty"` //
 	MachineID      string            `json:"machineId,omitempty"` //
@@ -61,14 +61,13 @@ type PhysicalInfo struct {
 	ServerPort string `json:"serverPort"`
 }
 type KubernetesInfo struct {
-	CA        string      `json:"ca"`
+	CA        string      `json:"ca,omitempty"`
 	Namespace string      `json:"namespace"`
 	Server    string      `json:"server"`
 	Port      string      `json:"port"`
 	Version   *K8sVersion `json:"version"`
 }
 type K8sVersion struct {
-	Namespace    string    `json:"namespace"`
 	Major        string    `json:"major"`
 	Minor        string    `json:"minor"`
 	GitVersion   string    `json:"gitVersion"`
@@ -78,4 +77,7 @@ type K8sVersion struct {
 	GoVersion    string    `json:"goVersion"`
 	Compiler     string    `json:"compiler"`
 	Platform     string    `json:"platform"`
+}
+type Payload struct {
+	Data string `json:"data" description:"加密信息"`
 }
