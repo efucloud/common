@@ -67,11 +67,11 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 			applicationInfo.Error = err.Error()
 			return
 		}
-		var k8sTokenPayload common.K8sTokenPayload
+		var k8sTokenPayload *common.K8sTokenPayload
 		if token, err := os.ReadFile(path.Join(k8sPath, "token")); err == nil {
-			if t, err := jwt.ParseWithClaims(string(token), &k8sTokenPayload, func(token *jwt.Token) (interface{}, error) {
+			if t, err := jwt.ParseWithClaims(string(token), k8sTokenPayload, func(token *jwt.Token) (interface{}, error) {
 				return nil, nil
-			}); err == nil {
+			}); k8sTokenPayload != nil {
 				if payload, ok := t.Claims.(*common.K8sTokenPayload); ok {
 					if payload.Namespace != applicationInfo.KubernetesInfo.Namespace {
 						applicationInfo.Error = "namespace is not right"
