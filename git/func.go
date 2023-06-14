@@ -22,7 +22,6 @@ import (
 	"github.com/efucloud/common"
 	"github.com/ghodss/yaml"
 	"gopkg.in/ini.v1"
-	"io/ioutil"
 	"k8s.io/klog/v2"
 	"os"
 	"path"
@@ -130,7 +129,7 @@ func getCommitLog(logPath, hash string) (all, author, email, commit, t string, t
 }
 
 func getCommitHash(p string) (h string, err error) {
-	data, err := ioutil.ReadFile(p)
+	data, err := os.ReadFile(p)
 	if err != nil {
 		klog.Errorf("read: %s failed, err: %s", p, err.Error())
 		return h, err
@@ -138,7 +137,7 @@ func getCommitHash(p string) (h string, err error) {
 	return strings.Trim(string(data), "\n"), err
 }
 func getCurrentBranch(headPath string) (ref, branch string, err error) {
-	data, err := ioutil.ReadFile(headPath)
+	data, err := os.ReadFile(headPath)
 	if err != nil {
 		klog.Errorf("read: %s failed, err: %s", headPath, err.Error())
 		return ref, headPath, err

@@ -3,7 +3,7 @@ package eauth
 import (
 	"crypto/rsa"
 	"errors"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func ParserToken(tokenStr string, verifyKeys []*rsa.PublicKey) (claims AccountClaims, err error) {

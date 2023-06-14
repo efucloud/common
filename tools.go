@@ -27,7 +27,6 @@ import (
 	"github.com/ghodss/yaml"
 	"golang.org/x/crypto/bcrypt"
 	"io"
-	"io/ioutil"
 	"k8s.io/klog/v2"
 	"os"
 	"path"
@@ -37,7 +36,7 @@ import (
 )
 
 func GetAllFiles(dirPath string) (dirs []string, files []string, err error) {
-	fs, err := ioutil.ReadDir(dirPath)
+	fs, err := os.ReadDir(dirPath)
 	if err != nil {
 		return
 	}
@@ -59,7 +58,7 @@ func GetAllFiles(dirPath string) (dirs []string, files []string, err error) {
 func GetModuleFiles(dirPath string) (dirs []string, modules map[string][]string, err error) {
 	modules = make(map[string][]string)
 	modules[""] = []string{}
-	fs, err := ioutil.ReadDir(dirPath)
+	fs, err := os.ReadDir(dirPath)
 	if err != nil {
 		return
 	}
@@ -82,7 +81,7 @@ func GetModuleFiles(dirPath string) (dirs []string, modules map[string][]string,
 
 func LoadConfig(path string, object interface{}) {
 	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
-		if data, err := ioutil.ReadFile(path); err == nil {
+		if data, err := os.ReadFile(path); err == nil {
 			if jsonData, err := yaml.YAMLToJSON(data); err != nil {
 				klog.Fatalf("Unable to decode application %s yaml config from file, err: %s", path, err)
 			} else {
@@ -95,7 +94,7 @@ func LoadConfig(path string, object interface{}) {
 
 		}
 	} else if strings.HasSuffix(path, ".json") {
-		if data, err := ioutil.ReadFile(path); err == nil {
+		if data, err := os.ReadFile(path); err == nil {
 			if err = json.Unmarshal(data, object); err != nil {
 				klog.Fatalf("Unable to decode application %s json config from file, err: %s", path, err)
 			}
@@ -196,7 +195,6 @@ func CamelString2Snake(s string) string {
 		d := s[i]
 		if i > 0 && d >= 'A' && d <= 'Z' && j {
 			data = append(data, '_')
-
 		}
 		if d != '_' {
 			j = true

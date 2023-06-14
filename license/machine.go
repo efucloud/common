@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"github.com/denisbrodbeck/machineid"
 	"github.com/efucloud/common"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"k8s.io/klog/v2"
 	"net/http"
 	"os"
@@ -63,12 +63,15 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 			info.Kubernetes.Namespace = string(ns)
 			applicationInfo.KubernetesInfo.Namespace = info.Kubernetes.Namespace
 		} else {
+			klog.Error(err)
 			applicationInfo.Error = err.Error()
 			return
 		}
 		var k8sTokenPayload common.K8sTokenPayload
 		if token, err := os.ReadFile(path.Join(k8sPath, "token")); err == nil {
-			if t, err := jwt.ParseWithClaims(string(token), &k8sTokenPayload, nil); err == nil {
+			if t, err := jwt.ParseWithClaims(string(token), &k8sTokenPayload, func(token *jwt.Token) (interface{}, error) {
+				return nil, nil
+			}); err == nil {
 				if payload, ok := t.Claims.(*common.K8sTokenPayload); ok {
 					if payload.Namespace != applicationInfo.KubernetesInfo.Namespace {
 						applicationInfo.Error = "namespace is not right"
@@ -82,11 +85,13 @@ func GetMachineInformation(appName string) (applicationInfo common.ApplicationIn
 					return
 				}
 			} else {
+				klog.Error(err)
 				applicationInfo.Error = err.Error()
 				return
 			}
 			applicationInfo.MachineID = common.MD5VByte(ca)
 		} else {
+			klog.Error(err)
 			applicationInfo.Error = err.Error()
 			return
 		}

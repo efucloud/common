@@ -16,7 +16,7 @@ limitations under the License.
 
 package eauth
 
-import "github.com/golang-jwt/jwt/v4"
+import "github.com/golang-jwt/jwt/v5"
 
 type OIDCConfig struct {
 	// 提供商的地址，如https://gitlab.com,在不配置Certificate的情况下，程序会根据https://gitlab.com/.well-known/openid-configuration获取token的公钥
