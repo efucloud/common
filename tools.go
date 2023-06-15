@@ -190,11 +190,17 @@ func Snake2CamelString(s string) string {
 func CamelString2Snake(s string) string {
 	data := make([]byte, 0, len(s)*2)
 	j := false
+	first := true
 	num := len(s)
 	for i := 0; i < num; i++ {
 		d := s[i]
 		if i > 0 && d >= 'A' && d <= 'Z' && j {
-			data = append(data, '_')
+			if first {
+				data = append(data, '_')
+				first = false
+			}
+		} else {
+			first = true
 		}
 		if d != '_' {
 			j = true
