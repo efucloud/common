@@ -36,7 +36,13 @@ type K8sTokenClaimsKubernetesIo struct {
 type K8sTokenPayload struct {
 	Claims *K8sTokenClaims `json:"Claims"`
 }
-
+type ApplicationPublicInfo struct {
+	Application string `json:"application" description:"应用名称"`
+	GoVersion   string `json:"goVersion" description:"构建的Go版本"`
+	Commit      string `json:"commit" description:"当前构建的Commit"`
+	BuildDate   string `json:"buildDate" description:"构建时间"`
+	Edition     string `json:"edition" description:"当前版本"`
+}
 type ApplicationInfo struct {
 	Application    string            `json:"application"`
 	GoVersion      string            `json:"goVersion"`
