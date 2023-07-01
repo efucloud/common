@@ -143,16 +143,7 @@ func ResponseErrorMessage(resp *restful.Response, bundle *i18n.Bundle, detail Er
 	if detail.Err != nil {
 		body.Detail = detail.Err.Error()
 	}
-	switch detail.ResponseCode {
-	case http.StatusUnauthorized:
-		body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, "statusUnauthorized")
-	case http.StatusBadRequest:
-		body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, "statusBadRequest")
-	case http.StatusForbidden:
-		body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, "statusForbidden")
-	default:
-		body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, detail.MsgCode)
-	}
+	body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, detail.MsgCode)
 	_ = resp.WriteAsJson(body)
 }
 
