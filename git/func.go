@@ -110,6 +110,7 @@ func getCommitLog(logPath, hash string) (all, author, email, commit, t string, t
 		}
 	}
 	if len(targetLine) > 0 {
+		fmt.Println(targetLine)
 		sp := strings.Split(targetLine, hash)
 		if len(sp) > 1 {
 			all = strings.TrimSpace(strings.Join(sp[1:], ""))
@@ -123,7 +124,7 @@ func getCommitLog(logPath, hash string) (all, author, email, commit, t string, t
 				}
 			}
 		}
-		commit = strings.TrimSuffix(strings.Trim(strings.Split(targetLine, "commit: ")[1], `"`), "\n")
+		commit = strings.TrimSuffix(strings.Trim(strings.Split(targetLine, "commit")[1], `"`), "\n")
 	}
 
 	return

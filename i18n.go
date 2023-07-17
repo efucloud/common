@@ -115,8 +115,8 @@ type ErrorData struct {
 	Params       map[string]interface{} `json:"params"`       // 需要渲染的参数
 }
 
-func (ed ErrorData) IsNil() bool {
-	return ed.Err == nil
+func (ed ErrorData) IsNotNil() bool {
+	return ed.Err != nil
 }
 
 func (ed ErrorData) String() string {
