@@ -118,6 +118,9 @@ type ErrorData struct {
 func (ed ErrorData) IsNotNil() bool {
 	return ed.Err != nil
 }
+func (ed ErrorData) IsNil() bool {
+	return ed.Err == nil
+}
 
 func (ed ErrorData) String() string {
 	return fmt.Sprintf("Lang: %s, ResponseCode: %d, MsgCode: %s, Error; %v",
