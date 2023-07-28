@@ -24,11 +24,11 @@ import (
 )
 
 type UserInfoPath struct {
-	Username     string `json:"username" description:"用户名"`
-	Email        string `json:"email" description:"邮箱"`
-	Nickname     string `json:"nickname" description:"别名"`
-	Organization string `json:"organization" description:"组织"`
-	ID           string `json:"id" description:"记录ID"`
+	Username     string `json:"username" yaml:"username" description:"用户名"`
+	Email        string `json:"email" yaml:"email" description:"邮箱"`
+	Nickname     string `json:"nickname" yaml:"nickname" description:"别名"`
+	Organization string `json:"organization" yaml:"organization" description:"组织"`
+	ID           string `json:"id" yaml:"id" description:"记录ID"`
 }
 
 func (UserInfoPath) GormDataType() string {
