@@ -87,7 +87,7 @@ func ValidateTrans(unTrans *ut.UniversalTranslator, validate *validator.Validate
 	return removeTopStruct(errs.Translate(trans))
 }
 
-func ValidateTransCtx(unTrans *ut.UniversalTranslator, ctxLangKey string, validate *validator.Validate, ctx context.Context, err error) FiledValidFailed {
+func ValidateTransCtx(ctx context.Context, unTrans *ut.UniversalTranslator, ctxLangKey string, validate *validator.Validate, err error) FiledValidFailed {
 	lang := ctx.Value(ctxLangKey)
 	lan := I18nZH
 	if lang != nil {
