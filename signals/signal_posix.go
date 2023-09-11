@@ -1,4 +1,4 @@
-// Copyright (c) citicbank.com All rights reserved
+// Copyright 2022 The efucloud.com Authors.
 //go:build linux || darwin
 // +build linux darwin
 
