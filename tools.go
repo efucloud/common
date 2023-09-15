@@ -170,10 +170,10 @@ func Snake2CamelString(s string) string {
 	num := len(s) - 1
 	for i := 0; i <= num; i++ {
 		d := s[i]
-		if k == false && d >= 'A' && d <= 'Z' {
+		if !k && d >= 'A' && d <= 'Z' {
 			k = true
 		}
-		if d >= 'a' && d <= 'z' && (j || k == false) {
+		if d >= 'a' && d <= 'z' && (j || !k) {
 			d = d - 32
 			j = false
 			k = true
@@ -225,7 +225,6 @@ func StringsToUints(strings []string) (ints []uint) {
 func GetStructFieldsType(v interface{}) (fields map[string]string) {
 	fields = make(map[string]string)
 	dataType := reflect.TypeOf(v)
-	dataValue := reflect.ValueOf(v)
 	if dataType.Kind() == reflect.Ptr {
 		originType := reflect.ValueOf(v).Elem().Type()
 		if originType.Kind() != reflect.Struct {
@@ -233,7 +232,6 @@ func GetStructFieldsType(v interface{}) (fields map[string]string) {
 		}
 		// 解引用
 		dataType = dataType.Elem()
-		dataValue = dataValue.Elem()
 		num := dataType.NumField()
 		for i := 0; i < num; i++ {
 			name := strings.SplitN(dataType.Field(i).Tag.Get("json"), ",", 2)[0]
@@ -251,9 +249,6 @@ func GetStructFieldsType(v interface{}) (fields map[string]string) {
 //
 // TODO(ericchiang): refactor ID creation onto the storage.
 var encoding = base32.NewEncoding("abcdefghijklmnopqrstuvwxyz234567")
-
-// Valid characters for user codes
-const validUserCharacters = "BCDFGHJKLMNPQRSTVWXZ"
 
 // NewDeviceCode returns a 32 char alphanumeric cryptographically secure string
 func NewDeviceCode() string {
@@ -313,10 +308,7 @@ func StringToFloat64(str string) float64 {
 func PathExists(path string) bool {
 	_, err := os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
-		if os.IsExist(err) {
-			return true
-		}
-		return false
+		return os.IsExist(err)
 	}
 	return true
 }
@@ -355,16 +347,14 @@ func IntInArray(key int, arrays []int) (exist bool) {
 
 func GetRandomString(n int) string {
 	randBytes := make([]byte, n/2)
-	rand.Read(randBytes)
+	_, _ = rand.Read(randBytes)
 	return fmt.Sprintf("%x", randBytes)
 }
 func URL(front, behind string) (url string) {
 	if !strings.HasSuffix(front, "/") {
 		front += "/"
 	}
-	if strings.HasPrefix(behind, "/") {
-		behind = behind[1:]
-	}
+	behind = strings.TrimPrefix(behind, "/")
 	return front + behind
 }
 

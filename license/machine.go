@@ -121,11 +121,11 @@ func GetMachineInformation(appName string, logger *zap.SugaredLogger) (applicati
 		if runtime.GOOS == "linux" {
 			//只要是linux就认为是容器内部
 			if common.PathExists(dockerEnv) {
-				applicationInfo.Error = fmt.Sprintf("application not support running in docker")
+				applicationInfo.Error = "application not support running in docker"
 			}
 		} else {
 			applicationInfo.PhysicalInfo = new(common.PhysicalInfo)
-			applicationInfo.PhysicalInfo.MachineID, err = machineid.ProtectedID(appName)
+			applicationInfo.PhysicalInfo.MachineID, _ = machineid.ProtectedID(appName)
 		}
 	}
 

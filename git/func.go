@@ -52,7 +52,7 @@ func GetGitRepoInformation(logger *zap.SugaredLogger) (result *RepositoryInforma
 	if err != nil {
 		return
 	}
-	result.CommitInfo, result.Author, result.Email, result.Commit, result.Time, result.Timestamp, err =
+	result.CommitInfo, result.Author, result.Email, result.Commit, result.Time, result.Timestamp, _ =
 		getCommitLog(path.Join(gitPath, "logs", result.Ref), result.Hash)
 	result.Remote, result.Url = getRemoteAndUrl(path.Join(gitPath, "config"), result.Branch, logger)
 	return result

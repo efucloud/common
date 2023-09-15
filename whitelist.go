@@ -28,6 +28,6 @@ func init() {
 
 // GetWhiteList 后期从服务器获取，并缓存
 func GetWhiteList(serial string) (user string) {
-	user, _ = WhiteList[serial]
+	user = WhiteList[serial]
 	return user
 }

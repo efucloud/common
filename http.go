@@ -120,7 +120,7 @@ type ResponseList struct {
 }
 
 func ResponseSuccess(resp *restful.Response, info interface{}) {
-	resp.WriteAsJson(info)
+	_ = resp.WriteAsJson(info)
 
 }
 func ResponseAuthRedirect(ctx context.Context, resp *restful.Response, bundle *i18n.Bundle, lang, message, authorizationEndpoint string,
