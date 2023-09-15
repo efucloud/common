@@ -1,6 +1,6 @@
 module github.com/efucloud/common
 
-go 1.18
+go 1.20
 
 require (
 	github.com/denisbrodbeck/machineid v1.0.1
