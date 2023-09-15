@@ -22,7 +22,6 @@ import (
 	"github.com/efucloud/common"
 	"github.com/ghodss/yaml"
 	"go.uber.org/zap"
-	"gopkg.in/ini.v1"
 	"k8s.io/klog/v2"
 	"os"
 	"path"
@@ -57,38 +56,6 @@ func GetGitRepoInformation(logger *zap.SugaredLogger) (result *RepositoryInforma
 	result.Remote, result.Url = getRemoteAndUrl(path.Join(gitPath, "config"), result.Branch, logger)
 	return result
 
-}
-func getRemoteAndUrl(p, branch string, logger *zap.SugaredLogger) (remote, url string) {
-	cfg, err := ini.Load(p)
-	if err != nil {
-		logger.Errorf("load file: %s failed, err: %s", p, err.Error())
-		return
-	}
-	sn := fmt.Sprintf(`branch "%s"`, branch)
-	section, err := cfg.GetSection(sn)
-	if err != nil {
-		logger.Errorf("get section: %s failed, err: %s", sn, err.Error())
-		return
-	}
-	key, err := section.GetKey("remote")
-	if err != nil {
-		logger.Errorf("get section: %s key: remote failed, err: %s", sn, err.Error())
-		return
-	}
-	remote = key.Value()
-	remoteSn := fmt.Sprintf(`remote "%s"`, remote)
-	section, err = cfg.GetSection(remoteSn)
-	if err != nil {
-		logger.Errorf("get section: %s failed, err: %s", remoteSn, err.Error())
-		return
-	}
-	key, err = section.GetKey("url")
-	if err != nil {
-		logger.Errorf("get section: %s key: remote failed, err: %s", sn, err.Error())
-		return
-	}
-	url = key.Value()
-	return
 }
 func getCommitLog(logPath, hash string) (all, author, email, commit, t string, timestamp int64, err error) {
 	file, err := os.Open(logPath)
