@@ -21,7 +21,6 @@ import (
 	"embed"
 	"fmt"
 	"github.com/emicklei/go-restful/v3"
-	"github.com/ghodss/yaml"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
@@ -31,6 +30,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"go.uber.org/zap"
 	"golang.org/x/text/language"
+	"gopkg.in/yaml.v2"
 	"path"
 )
 
