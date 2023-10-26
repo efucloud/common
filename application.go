@@ -42,6 +42,7 @@ type ApplicationPublicInfo struct {
 	Commit      string `json:"commit" description:"当前构建的Commit"`
 	BuildDate   string `json:"buildDate" description:"构建时间"`
 	Edition     string `json:"edition" description:"当前版本"`
+	BuiltInOrg  string `json:"builtInOrg" description:"内建组织编码"`
 	JoinedOrg   bool   `json:"joinedOrg" description:"是否开启加入组织功能"`
 }
 type ApplicationInfo struct {
