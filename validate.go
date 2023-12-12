@@ -110,5 +110,5 @@ func CodeValidate(fl validator.FieldLevel) bool {
 	if StringKeyInArray(fl.Field().String(), allows) {
 		return false
 	}
-	return dns1123Reg.MatchString(code)
+	return RFC1123Reg.MatchString(code)
 }
