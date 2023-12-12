@@ -25,17 +25,20 @@ import (
 	"time"
 )
 
-var dns1123Reg *regexp.Regexp
+var RFC1123Reg *regexp.Regexp
 
 func init() {
-	dns1123Reg = regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])?`)
+	RFC1123Reg = regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
 }
 func ValidateTime(fl validator.FieldLevel) bool {
 	_, err := time.Parse(TimeFormat, fl.Field().String())
 	return err == nil
 }
-func ValidateDNS1123(fl validator.FieldLevel) bool {
-	return dns1123Reg.MatchString(fl.Field().String())
+func ValidateRFC1123RegString(fl string) bool {
+	return RFC1123Reg.MatchString(fl)
+}
+func ValidateRFC1123Reg(fl validator.FieldLevel) bool {
+	return RFC1123Reg.MatchString(fl.Field().String())
 }
 func NotBlank(fl validator.FieldLevel) bool {
 	field := fl.Field()
