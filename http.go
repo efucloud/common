@@ -121,7 +121,7 @@ type ResponseList struct {
 
 func ResponseSuccess(resp *restful.Response, info interface{}) {
 	resp.Header().Add("X-Content-Type-Options", "nosniff")
-	resp.Header().Add("X-XSS-Protection", "X-XSS-Protection: 1; mode=block")
+	resp.Header().Add("X-XSS-Protection", "1; mode=block")
 	_ = resp.WriteAsJson(info)
 
 }
@@ -140,7 +140,7 @@ func ResponseErrorMessage(ctx context.Context, resp *restful.Response, bundle *i
 		detail.ResponseCode = http.StatusInternalServerError
 	}
 	resp.Header().Add("X-Content-Type-Options", "nosniff")
-	resp.Header().Add("X-XSS-Protection", "X-XSS-Protection: 1; mode=block")
+	resp.Header().Add("X-XSS-Protection", "1; mode=block")
 	resp.WriteHeader(detail.ResponseCode)
 	var body ResponseError
 	body.Message = detail.MsgCode
