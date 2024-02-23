@@ -127,13 +127,12 @@ func ResponseSuccess(resp *restful.Response, info interface{}) {
 }
 func ResponseAuthRedirect(ctx context.Context, resp *restful.Response, bundle *i18n.Bundle, lang, message, authorizationEndpoint string,
 	params map[string]interface{}) {
-	resp.WriteHeader(http.StatusUnauthorized)
 	var body AuthRedirectInfo
 	body.Message = message
 	body.Params = params
 	body.AuthorizationEndpoint = authorizationEndpoint
 	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
-	_ = resp.WriteAsJson(body)
+	_ = resp.WriteHeaderAndJson(http.StatusUnauthorized, body, restful.MIME_JSON)
 }
 func ResponseErrorMessage(ctx context.Context, resp *restful.Response, bundle *i18n.Bundle, detail ErrorData) {
 	if detail.ResponseCode == 0 {
@@ -141,14 +140,14 @@ func ResponseErrorMessage(ctx context.Context, resp *restful.Response, bundle *i
 	}
 	resp.Header().Add("X-Content-Type-Options", "nosniff")
 	resp.Header().Add("X-XSS-Protection", "1; mode=block")
-	resp.WriteHeader(detail.ResponseCode)
 	var body ResponseError
 	body.Message = detail.MsgCode
 	if detail.Err != nil {
 		body.Detail = detail.Err.Error()
 	}
 	body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, detail.MsgCode)
-	_ = resp.WriteAsJson(body)
+	_ = resp.WriteHeaderAndJson(detail.ResponseCode, body, restful.MIME_JSON)
+
 }
 
 // RequestQuery paramType: string,number queryType: eq,like
