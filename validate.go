@@ -283,8 +283,9 @@ var zhTrans = []internalTranslation{
 	},
 }
 
-func LoadValidateTranslator(lang string, validate *validator.Validate, customValidators ...string) (trans ut.Translator) {
-
+func LoadValidateTranslator(lang string, validate *validator.Validate) (trans ut.Translator) {
+	_ = validate.RegisterValidation("notoneof", notOneOf)
+	_ = validate.RegisterValidation("multiof", multiOf)
 	switch lang {
 	case I18nZH:
 		uni := ut.New(zh.New(), zh.New())
@@ -301,16 +302,6 @@ func LoadValidateTranslator(lang string, validate *validator.Validate, customVal
 		trans, _ = uni.GetTranslator(lang)
 		trans = addTrans(I18nZH, validate, trans)
 		_ = zhtrans.RegisterDefaultTranslations(validate, trans)
-	}
-	for _, item := range customValidators {
-		switch item {
-		case "notoneof":
-			_ = validate.RegisterValidation(item, notOneOf)
-		case "multiof":
-			_ = validate.RegisterValidation(item, multiOf)
-		default:
-			continue
-		}
 	}
 
 	return
