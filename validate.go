@@ -18,7 +18,11 @@ package common
 
 import (
 	"fmt"
+	"github.com/go-playground/locales/zh"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	entrans "github.com/go-playground/validator/v10/translations/en"
+	zhtrans "github.com/go-playground/validator/v10/translations/zh"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -114,8 +118,31 @@ func CodeValidate(fl validator.FieldLevel) bool {
 	}
 	return RFC1123Reg.MatchString(code)
 }
+func multiOf(fl validator.FieldLevel) bool {
+	vals := parseOneOfParam2(fl.Param())
 
-func NotOneOf(fl validator.FieldLevel) bool {
+	field := fl.Field()
+
+	var v string
+	switch field.Kind() {
+	case reflect.Array:
+		v = field.String()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		v = strconv.FormatInt(field.Int(), 10)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		v = strconv.FormatUint(field.Uint(), 10)
+	default:
+		panic(fmt.Sprintf("Bad field type %T", field.Interface()))
+	}
+	for i := 0; i < len(vals); i++ {
+		if vals[i] == v {
+			return false
+		}
+	}
+	return true
+}
+
+func notOneOf(fl validator.FieldLevel) bool {
 	vals := parseOneOfParam2(fl.Param())
 
 	field := fl.Field()
@@ -160,4 +187,150 @@ func parseOneOfParam2(s string) []string {
 		oneofValsCacheRWLock.Unlock()
 	}
 	return vals
+}
+
+type internalTranslation struct {
+	tag             string
+	translation     string
+	override        bool
+	customRegisFunc validator.RegisterTranslationsFunc
+	customTransFunc validator.TranslationFunc
+}
+
+func addTrans(lang string, validate *validator.Validate, trans ut.Translator) ut.Translator {
+	if lang == I18nZH {
+		for _, t := range zhTrans {
+
+			if t.customTransFunc != nil && t.customRegisFunc != nil {
+				_ = validate.RegisterTranslation(t.tag, trans, t.customRegisFunc, t.customTransFunc)
+			} else if t.customTransFunc != nil && t.customRegisFunc == nil {
+				_ = validate.RegisterTranslation(t.tag, trans, registrationFunc(t.tag, t.translation, t.override), t.customTransFunc)
+			} else if t.customTransFunc == nil && t.customRegisFunc != nil {
+				_ = validate.RegisterTranslation(t.tag, trans, t.customRegisFunc, translateFunc)
+			} else {
+				_ = validate.RegisterTranslation(t.tag, trans, registrationFunc(t.tag, t.translation, t.override), translateFunc)
+			}
+
+		}
+	} else if lang == I18nEN {
+		for _, t := range enTrans {
+			if t.customTransFunc != nil && t.customRegisFunc != nil {
+				_ = validate.RegisterTranslation(t.tag, trans, t.customRegisFunc, t.customTransFunc)
+			} else if t.customTransFunc != nil && t.customRegisFunc == nil {
+				_ = validate.RegisterTranslation(t.tag, trans, registrationFunc(t.tag, t.translation, t.override), t.customTransFunc)
+			} else if t.customTransFunc == nil && t.customRegisFunc != nil {
+				_ = validate.RegisterTranslation(t.tag, trans, t.customRegisFunc, translateFunc)
+			} else {
+				_ = validate.RegisterTranslation(t.tag, trans, registrationFunc(t.tag, t.translation, t.override), translateFunc)
+			}
+
+		}
+	}
+	return trans
+}
+
+var enTrans = []internalTranslation{
+	{
+		tag:         "notoneof",
+		translation: "{0} must not one of [{1}]",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
+	{
+		tag:         "multiof",
+		translation: "{0} must not one of [{1}]",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
+}
+
+var zhTrans = []internalTranslation{
+	{
+		tag:         "notoneof",
+		translation: "{0} 不能为 [{1}] 中的任何一个",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
+	{
+		tag:         "multiof",
+		translation: "{0} 必须为 [{1}] 中的一个或几个",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
+}
+
+func LoadValidateTranslator(lang string, validate *validator.Validate, customValidators ...string) (trans ut.Translator) {
+
+	switch lang {
+	case I18nZH:
+		uni := ut.New(zh.New(), zh.New())
+		trans, _ = uni.GetTranslator(lang)
+		trans = addTrans(I18nZH, validate, trans)
+		_ = zhtrans.RegisterDefaultTranslations(validate, trans)
+	case I18nEN:
+		uni := ut.New(zh.New(), zh.New())
+		trans, _ = uni.GetTranslator(lang)
+		trans = addTrans(I18nEN, validate, trans)
+		_ = entrans.RegisterDefaultTranslations(validate, trans)
+	default:
+		uni := ut.New(zh.New(), zh.New())
+		trans, _ = uni.GetTranslator(lang)
+		trans = addTrans(I18nZH, validate, trans)
+		_ = zhtrans.RegisterDefaultTranslations(validate, trans)
+	}
+	for _, item := range customValidators {
+		switch item {
+		case "notoneof":
+			_ = validate.RegisterValidation(item, notOneOf)
+		case "multiof":
+			_ = validate.RegisterValidation(item, multiOf)
+		default:
+			continue
+		}
+	}
+
+	return
+}
+
+func registrationFunc(tag string, translation string, override bool) validator.RegisterTranslationsFunc {
+	return func(ut ut.Translator) (err error) {
+		if err = ut.Add(tag, translation, override); err != nil {
+			return
+		}
+
+		return
+	}
+}
+
+func translateFunc(ut ut.Translator, fe validator.FieldError) string {
+	t, err := ut.T(fe.Tag(), fe.Field())
+	if err != nil {
+		return fe.(error).Error()
+	}
+
+	return t
 }
