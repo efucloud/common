@@ -1,13 +1,13 @@
 package messagebus
 
 const (
-	MessagePubDapr     = "dapr"
-	MessagePubKafka    = "kafka"
-	MessagePubPulsar   = "pulsar"
-	MessagePubRocketMQ = "rocketmq"
-	MessagePubRedis    = "redis"
-	MessagePubNats     = "nats"
-	MessagePubRabbitMQ = "rabbitmq"
+	MessageBusDapr     = "dapr"
+	MessageBusKafka    = "kafka"
+	MessageBusPulsar   = "pulsar"
+	MessageBusRocketMQ = "rocketmq"
+	MessageBusRedis    = "redis"
+	MessageBusNats     = "nats"
+	MessageBusRabbitMQ = "rabbitmq"
 )
 const (
 	TopicOrganization          = "/messagebus/eauth/organization"
