@@ -77,7 +77,7 @@ func TagNameI18N(lang string) validator.TagNameFunc {
 			if name == "" {
 				return field.Name
 			} else {
-				return fmt.Sprintf(`"%s"`, name)
+				return fmt.Sprintf(`【%s】`, name)
 			}
 		default:
 			return field.Name
