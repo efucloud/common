@@ -68,17 +68,17 @@ func TagNameFunc(fld reflect.StructField) string {
 	return name
 }
 
-func TagNameI18N(fld reflect.StructField, lang string) validator.TagNameFunc {
+func TagNameI18N(lang string) validator.TagNameFunc {
 	return func(field reflect.StructField) string {
 		name := ""
 		switch lang {
 		case I18nZH:
-			name = strings.SplitN(fld.Tag.Get("description"), ":", 2)[0]
+			name = strings.SplitN(field.Tag.Get("description"), ":", 2)[0]
 			if name == "" {
-				return fld.Name
+				return field.Name
 			}
 		default:
-			return fld.Name
+			return field.Name
 		}
 
 		return name
