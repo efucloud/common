@@ -82,8 +82,6 @@ func TagNameI18N(lang string) validator.TagNameFunc {
 		default:
 			return field.Name
 		}
-
-		return name
 	}
 
 }
