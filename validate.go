@@ -76,6 +76,8 @@ func TagNameI18N(lang string) validator.TagNameFunc {
 			name = strings.SplitN(field.Tag.Get("description"), ":", 2)[0]
 			if name == "" {
 				return field.Name
+			} else {
+				return fmt.Sprintf(`"%s"`, name)
 			}
 		default:
 			return field.Name
