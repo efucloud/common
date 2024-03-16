@@ -67,7 +67,19 @@ func TagNameFunc(fld reflect.StructField) string {
 	}
 	return name
 }
+func TagNameI18N(fld reflect.StructField, lang string) (name string) {
+	switch lang {
+	case I18nZH:
+		name = strings.SplitN(fld.Tag.Get("description"), ":", 2)[0]
+		if name == "" {
+			return fld.Name
+		}
+	default:
+		return fld.Name
+	}
 
+	return name
+}
 func removeTopStruct(fields map[string]string) map[string]string {
 	res := map[string]string{}
 	for field, err := range fields {
