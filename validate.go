@@ -158,7 +158,121 @@ func multiOf(fl validator.FieldLevel) bool {
 	}
 	return true
 }
+func mutex(fl validator.FieldLevel) bool {
+	field := fl.Field()
+	kind := field.Kind()
 
+	currentField, currentKind, _, ok := fl.GetStructFieldOK2()
+	if !ok {
+		return false
+	}
+	fieldHasValue := false
+	currentHasValue := false
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if field.Int() > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if field.Uint() > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Float32, reflect.Float64:
+		if field.Float() > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Slice, reflect.Map, reflect.Array:
+		if int64(field.Len()) > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Bool:
+		if field.Bool() {
+			fieldHasValue = true
+		}
+	}
+	switch currentKind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if currentField.Int() > 0 {
+			currentHasValue = true
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if currentField.Uint() > 0 {
+			currentHasValue = true
+		}
+	case reflect.Float32, reflect.Float64:
+		if currentField.Float() > 0 {
+			currentHasValue = true
+		}
+	case reflect.Slice, reflect.Map, reflect.Array:
+		if int64(currentField.Len()) > 0 {
+			currentHasValue = true
+		}
+	case reflect.Bool:
+		if currentField.Bool() {
+			currentHasValue = true
+		}
+	}
+	if currentHasValue != fieldHasValue {
+		return true
+	}
+	return false
+}
+func allExist(fl validator.FieldLevel) bool {
+	field := fl.Field()
+	kind := field.Kind()
+
+	currentField, currentKind, _, ok := fl.GetStructFieldOK2()
+	if !ok {
+		return false
+	}
+	fieldHasValue := false
+	currentHasValue := false
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if field.Int() > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if field.Uint() > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Float32, reflect.Float64:
+		if field.Float() > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Slice, reflect.Map, reflect.Array:
+		if int64(field.Len()) > 0 {
+			fieldHasValue = true
+		}
+	case reflect.Bool:
+		if field.Bool() {
+			fieldHasValue = true
+		}
+	}
+	switch currentKind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		if currentField.Int() > 0 {
+			currentHasValue = true
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if currentField.Uint() > 0 {
+			currentHasValue = true
+		}
+	case reflect.Float32, reflect.Float64:
+		if currentField.Float() > 0 {
+			currentHasValue = true
+		}
+	case reflect.Slice, reflect.Map, reflect.Array:
+		if int64(currentField.Len()) > 0 {
+			currentHasValue = true
+		}
+	case reflect.Bool:
+		if currentField.Bool() {
+			currentHasValue = true
+		}
+	}
+	return currentHasValue && fieldHasValue
+}
 func notOneOf(fl validator.FieldLevel) bool {
 	vals := parseOneOfParam2(fl.Param())
 
@@ -271,6 +385,30 @@ var enTrans = []internalTranslation{
 			return s
 		},
 	},
+	{
+		tag:         "mutex",
+		translation: "{0} can not has a value at the same time with field: {1}",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
+	{
+		tag:         "allexist",
+		translation: "{0} must has a value at the same time with field: {1}",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
 }
 
 var zhTrans = []internalTranslation{
@@ -298,11 +436,37 @@ var zhTrans = []internalTranslation{
 			return s
 		},
 	},
+	{
+		tag:         "mutex",
+		translation: "{0} 不能跟字段: {1} 同时存在值",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
+	{
+		tag:         "allexist",
+		translation: "{0} 必须跟字段: {1} 同时存在值",
+		override:    false,
+		customTransFunc: func(ut ut.Translator, fe validator.FieldError) string {
+			s, err := ut.T(fe.Tag(), fe.Field(), fe.Param())
+			if err != nil {
+				return fe.(error).Error()
+			}
+			return s
+		},
+	},
 }
 
 func LoadValidateTranslator(lang string, validate *validator.Validate) (trans ut.Translator) {
 	_ = validate.RegisterValidation("notoneof", notOneOf)
 	_ = validate.RegisterValidation("multiof", multiOf)
+	_ = validate.RegisterValidation("allexist", allExist)
+	_ = validate.RegisterValidation("mutex", mutex)
 	switch lang {
 	case I18nZH:
 		uni := ut.New(zh.New(), zh.New())
