@@ -10,7 +10,8 @@ const (
 	MessageBusRabbitMQ = "rabbitmq"
 )
 const (
-	TopicOrganization          = "/messagebus/eauth/organization"
-	TopicOrganizationAccount   = "/messagebus/eauth/account"
-	TopicOrganizationWorkspace = "/messagebus/eauth/workspace"
+	TopicOrganization            = "/messagebus/eauth/organization"
+	TopicOrganizationAccount     = "/messagebus/eauth/account"
+	TopicOrganizationWorkspace   = "/messagebus/eauth/workspace"
+	TopicOrganizationApplication = "/messagebus/eauth/application"
 )
