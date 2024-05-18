@@ -347,3 +347,15 @@ func NewHTTPClientWithCA(rootCA string, insecureSkipVerify bool) (client *http.C
 	}
 	return client, err
 }
+
+func GetLangFromCtx(ctx context.Context, key string) (lang string) {
+	lang = "zh"
+	if len(key) == 0 {
+		key = "RequestLanguage"
+	}
+	lan := ctx.Value(key)
+	if lan != nil {
+		lang = lan.(string)
+	}
+	return lang
+}
