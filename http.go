@@ -103,9 +103,10 @@ func HttpRequest(client *http.Client, method, address string, headers, cookies m
 }
 
 type ResponseError struct {
-	Message string `json:"message" yaml:"message"`
-	Detail  string `json:"detail" yaml:"detail"`
-	Alert   string `json:"alert" yaml:"alert"`
+	Message    string `json:"message" yaml:"message"`
+	Detail     string `json:"detail" yaml:"detail"`
+	Alert      string `json:"alert" yaml:"alert"`
+	RequestURI string `json:"requestUri" description:""`
 }
 type AuthRedirectInfo struct {
 	Message               string                 `json:"message"`
@@ -134,7 +135,7 @@ func ResponseAuthRedirect(ctx context.Context, resp *restful.Response, bundle *i
 	body.Alert, _ = GetLocaleMessage(bundle, nil, lang, "statusUnauthorized")
 	_ = resp.WriteHeaderAndJson(http.StatusUnauthorized, body, restful.MIME_JSON)
 }
-func ResponseErrorMessage(ctx context.Context, resp *restful.Response, bundle *i18n.Bundle, detail ErrorData) {
+func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restful.Response, bundle *i18n.Bundle, detail ErrorData) {
 	if detail.ResponseCode == 0 {
 		detail.ResponseCode = http.StatusInternalServerError
 	}
@@ -145,6 +146,7 @@ func ResponseErrorMessage(ctx context.Context, resp *restful.Response, bundle *i
 	if detail.Err != nil {
 		body.Detail = detail.Err.Error()
 	}
+	body.RequestURI = req.Request.RequestURI
 	body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, detail.MsgCode)
 	_ = resp.WriteHeaderAndJson(detail.ResponseCode, body, restful.MIME_JSON)
 
