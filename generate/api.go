@@ -215,11 +215,15 @@ func (rest *RestAPI) ParserRoutes() {
 			api.Parameters[p.Name] = p
 			if route.ReadSample != nil {
 				read := reflect.TypeOf(route.ReadSample)
-				rest.structTypes[read.Name()] = read
+				if read != nil {
+					rest.structTypes[read.Name()] = read
+				}
 			}
 			if route.WriteSample != nil {
 				write := reflect.TypeOf(route.WriteSample)
-				rest.structTypes[write.Name()] = write
+				if write != nil {
+					rest.structTypes[write.Name()] = write
+				}
 			}
 			for _, res := range route.ResponseErrors {
 				if res.Code == http.StatusOK || res.Code == http.StatusCreated {
