@@ -279,9 +279,6 @@ func StringToInt(str string) int {
 	if in, err := strconv.Atoi(str); err != nil {
 		return 0
 	} else {
-		if in < 1 {
-			in = 1
-		}
 		return in
 	}
 }
