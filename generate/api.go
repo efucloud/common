@@ -18,8 +18,8 @@ import (
 
 const apiHasPathParamsTemplate = "_{{_ .description _}}_" +
 	"export const _{{_ .functionName _}}_  = async (params?: any) => {\n" +
-	"    _{{_ .extractPathParams _}}_\n" +
-	"    return request(_{{_ .globalAPI _}}_, { method: '_{{_ .method _}}_' _{{_ if .queryParams _}}_ , params: rest _{{_ end _}}_ _{{_ if .body _}}_ , body: rest _{{_ end _}}_ });\n" +
+	"    _{{_ if .extractPathParams _}}_ _{{_  .extractPathParams _}}_ _{{_ end _}}_\n" +
+	"    return request(`_{{_ .api _}}_`, { method: '_{{_ .method _}}_' _{{_ if .params _}}_ , params: _{{_ .params _}}_ _{{_ end _}}_ _{{_ if .body _}}_ , body: _{{_ .body _}}_ _{{_ end _}}_ });\n" +
 	"};\n"
 
 const GlobalApiName = "GlobalApiName"
@@ -96,16 +96,18 @@ func ExtractStructFieldDescription(item reflect.Type) (result map[string]string)
 	return
 }
 
+const request = "import { request } from '@umijs/max';\n"
+
 func (rest *RestAPI) GenerateToDir(dir string) {
-	apiContent, typeContent := rest.Generate()
-	if len(apiContent) > 0 {
-		_ = os.WriteFile(path.Join(dir, time.Now().Format(time.DateOnly)+".api.ts"), []byte(apiContent), os.ModePerm)
+	typeContent := rest.Generate()
+	for k, c := range rest.files {
+		_ = os.WriteFile(path.Join(dir, "api."+k+".ts"), []byte(request+c), os.ModePerm)
 	}
 	if len(typeContent) > 0 {
-		_ = os.WriteFile(path.Join(dir, time.Now().Format(time.DateOnly)+".types.d.ts"), []byte(apiContent), os.ModePerm)
+		_ = os.WriteFile(path.Join(dir, "types.d.ts"), []byte(typeContent), os.ModePerm)
 	}
 }
-func (rest *RestAPI) Generate() (apiContent, typeContent string) {
+func (rest *RestAPI) Generate() (typeContent string) {
 
 	rest.ParserRoutes()
 	// 生成typescript定义
@@ -125,8 +127,11 @@ func (rest *RestAPI) Generate() (apiContent, typeContent string) {
 }
 func (rest *RestAPI) generateOneApi(api ApiData) (content string) {
 	var description string
+
 	description += fmt.Sprintf("// %s\n", api.Doc)
 	description += fmt.Sprintf("// %s\n", api.Notes)
+	description += fmt.Sprintf("// 请求方法: %s\n", api.Method)
+	description += fmt.Sprintf("// 请求地址: %s\n", api.Path)
 	for code, data := range api.Response {
 		description += fmt.Sprintf("// 响应码: %d  响应数据: %s\n", code, data)
 	}
@@ -152,14 +157,26 @@ func (rest *RestAPI) generateOneApi(api ApiData) (content string) {
 	params["description"] = description
 	params["functionName"] = api.Name
 	params["method"] = strings.ToLower(api.Method)
+	params["api"] = api.Path
 	if len(pathParams) > 0 {
 		params["extractPathParams"] = fmt.Sprintf("const { %s, ...rest } = params;", strings.Join(pathParams, ", "))
 	}
+	for _, p := range pathParams {
+		params["api"] = strings.ReplaceAll(params["api"].(string), fmt.Sprintf("{%s}", p), fmt.Sprintf("${%s}", p))
+	}
 	switch api.Method {
 	case http.MethodPost, http.MethodPut:
-		params["body"] = true
+		if len(pathParams) > 0 {
+			params["body"] = "rest"
+		} else {
+			params["body"] = "params"
+		}
 	case http.MethodGet, http.MethodDelete:
-		params["queryParams"] = true
+		if len(pathParams) > 0 {
+			params["params"] = "rest"
+		} else {
+			params["params"] = "params"
+		}
 	}
 	t, _ := template.New(time.Now().String()).Delims("_{{_", "_}}_").Parse(apiHasPathParamsTemplate)
 	b := new(bytes.Buffer)
@@ -178,15 +195,18 @@ func (rest *RestAPI) ParserRoutes() {
 		api.Notes = route.Notes
 		api.Path = route.Path
 		api.Method = route.Method
-
 		if name, exist := route.Metadata[rest.globalApiName]; exist {
 			api.Name = fmt.Sprintf("%v", name)
+			api.Name = strings.ReplaceAll(api.Name, "[", "")
+			api.Name = strings.ReplaceAll(api.Name, "]", "")
 		} else {
 			// todo 驼峰
 			api.Name = fmt.Sprintf("%s%s", strings.ToLower(route.Method), route.Operation)
 		}
 		if doc, ex := route.Metadata[restfulspec.KeyOpenAPITags]; ex {
-			api.DocumentName = strings.ReplaceAll(fmt.Sprintf("%v", doc), "-", "_")
+			n := strings.ReplaceAll(fmt.Sprintf("%v", doc), "[", "")
+			n = strings.ReplaceAll(n, "]", "")
+			api.DocumentName = strings.ReplaceAll(n, "-", "_")
 		} else {
 			api.DocumentName = "api"
 		}
@@ -214,29 +234,38 @@ func (rest *RestAPI) ParserRoutes() {
 			}
 			api.Parameters[p.Name] = p
 			if route.ReadSample != nil {
-				read := reflect.TypeOf(route.ReadSample)
+				read := reflect.ValueOf(route.ReadSample).Type()
 				if read != nil {
 					rest.structTypes[read.Name()] = read
 				}
 			}
 			if route.WriteSample != nil {
-				write := reflect.TypeOf(route.WriteSample)
+				write := reflect.ValueOf(route.WriteSample).Type()
 				if write != nil {
 					rest.structTypes[write.Name()] = write
 				}
 			}
 			for _, res := range route.ResponseErrors {
 				if res.Code == http.StatusOK || res.Code == http.StatusCreated {
-					successRes := reflect.TypeOf(res.Model)
-					if successRes != nil {
-						rest.structTypes[successRes.Name()] = successRes
-						api.Response[res.Code] = successRes.Name()
+					if res.Model != nil {
+						successRes := reflect.ValueOf(res.Model).Type()
+						if successRes != nil {
+							if successRes.Kind().String() == reflect.Pointer.String() || successRes.Kind().String() == reflect.Struct.String() {
+								rest.structTypes[successRes.Name()] = successRes
+								api.Response[res.Code] = successRes.Name()
+							}
+						}
 					}
 				} else {
-					if res.Model != nil && reflect.TypeOf(res.Model) != nil {
-						api.Response[res.Code] = GetStructFieldDescription(reflect.TypeOf(res.Model))
-
+					if res.Model != nil {
+						mo := reflect.ValueOf(res.Model).Type()
+						if mo != nil {
+							if mo.Kind().String() == reflect.Pointer.String() || mo.Kind().String() == reflect.Struct.String() {
+								api.Response[res.Code] = GetStructFieldDescription(mo)
+							}
+						}
 					}
+
 				}
 			}
 		}
