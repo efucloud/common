@@ -186,7 +186,7 @@ func (rest *RestAPI) ParserRoutes() {
 			api.Name = fmt.Sprintf("%s%s", strings.ToLower(route.Method), route.Operation)
 		}
 		if doc, ex := route.Metadata[restfulspec.KeyOpenAPITags]; ex {
-			api.DocumentName = strings.ReplaceAll(doc.(string), "-", "_")
+			api.DocumentName = strings.ReplaceAll(fmt.Sprintf("%v", doc), "-", "_")
 		} else {
 			api.DocumentName = "api"
 		}
