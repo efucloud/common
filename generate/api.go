@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
+
 	"net/http"
 	"os"
 	"path"
@@ -29,16 +31,18 @@ type RestAPI struct {
 	apis               map[string]ApiData
 	globalApiName      string
 	generateTypescript bool
+	files              map[string]string
 }
 
 type ApiData struct {
-	Name       string
-	Doc        string
-	Notes      string
-	Path       string
-	Method     string
-	Parameters map[string]Parameters
-	Response   map[int]string
+	DocumentName string
+	Name         string
+	Doc          string
+	Notes        string
+	Path         string
+	Method       string
+	Parameters   map[string]Parameters
+	Response     map[int]string
 }
 
 func (api ApiData) String() string {
@@ -62,6 +66,7 @@ func NewRestAPI(frontApiName string, generateTypescript bool) *RestAPI {
 		apis:               map[string]ApiData{},
 		globalApiName:      frontApiName,
 		generateTypescript: generateTypescript,
+		files:              map[string]string{},
 	}
 	if len(api.globalApiName) == 0 {
 		api.globalApiName = GlobalApiName
@@ -76,6 +81,7 @@ func GetStructFieldDescription(item reflect.Type) string {
 	return string(result)
 }
 func ExtractStructFieldDescription(item reflect.Type) (result map[string]string) {
+	result = make(map[string]string)
 	for i := 0; i < item.NumField(); i++ {
 		jsonName := item.Field(i).Tag.Get("json")
 		if len(jsonName) == 0 {
@@ -112,7 +118,7 @@ func (rest *RestAPI) Generate() (apiContent, typeContent string) {
 	}
 	// 生成api
 	for _, api := range rest.apis {
-		apiContent += rest.generateOneApi(api)
+		rest.files[api.DocumentName] += rest.generateOneApi(api)
 	}
 
 	return
@@ -178,6 +184,11 @@ func (rest *RestAPI) ParserRoutes() {
 		} else {
 			// todo 驼峰
 			api.Name = fmt.Sprintf("%s%s", strings.ToLower(route.Method), route.Operation)
+		}
+		if doc, ex := route.Metadata[restfulspec.KeyOpenAPITags]; ex {
+			api.DocumentName = strings.ReplaceAll(doc.(string), "-", "_")
+		} else {
+			api.DocumentName = "api"
 		}
 		for _, param := range route.ParameterDocs {
 			var p Parameters
