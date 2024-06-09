@@ -224,10 +224,15 @@ func (rest *RestAPI) ParserRoutes() {
 			for _, res := range route.ResponseErrors {
 				if res.Code == http.StatusOK || res.Code == http.StatusCreated {
 					successRes := reflect.TypeOf(res.Model)
-					rest.structTypes[successRes.Name()] = successRes
-					api.Response[res.Code] = successRes.Name()
+					if successRes != nil {
+						rest.structTypes[successRes.Name()] = successRes
+						api.Response[res.Code] = successRes.Name()
+					}
 				} else {
-					api.Response[res.Code] = GetStructFieldDescription(reflect.TypeOf(res.Model))
+					if res.Model != nil && reflect.TypeOf(res.Model) != nil {
+						api.Response[res.Code] = GetStructFieldDescription(reflect.TypeOf(res.Model))
+
+					}
 				}
 			}
 		}
