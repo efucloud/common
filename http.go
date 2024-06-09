@@ -103,16 +103,16 @@ func HttpRequest(client *http.Client, method, address string, headers, cookies m
 }
 
 type ResponseError struct {
-	Message    string `json:"message" yaml:"message"`
-	Detail     string `json:"detail" yaml:"detail"`
-	Alert      string `json:"alert" yaml:"alert"`
-	RequestURI string `json:"requestUri" description:""`
+	Message    string `json:"message" yaml:"message" description:"错误英文编码"`
+	Detail     string `json:"detail" yaml:"detail" description:"错误详情信息"`
+	Alert      string `json:"alert" yaml:"alert" description:"支持I18N的提示信息"`
+	RequestURI string `json:"requestUri" description:"当前请求地址"`
 }
 type AuthRedirectInfo struct {
-	Message               string                 `json:"message"`
-	Params                map[string]interface{} `json:"params"`
-	AuthorizationEndpoint string                 `json:"authorizationEndpoint"`
-	Alert                 string                 `json:"alert"`
+	Message               string                 `json:"message" description:"提示信息"`
+	Params                map[string]interface{} `json:"params" description:"重定向参数"`
+	AuthorizationEndpoint string                 `json:"authorizationEndpoint" description:"认证提供商地址"`
+	Alert                 string                 `json:"alert" description:"提示信息"`
 }
 
 type ResponseList struct {
