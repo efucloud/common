@@ -68,6 +68,9 @@ func NewRestAPI(frontApiName string, generateTypescript bool) *RestAPI {
 	}
 	return api
 }
+func (rest *RestAPI) AddRoute(route restful.Route) {
+	rest.routes = append(rest.routes, route)
+}
 func GetStructFieldDescription(item reflect.Type) string {
 	result, _ := json.Marshal(ExtractStructFieldDescription(item))
 	return string(result)
@@ -86,6 +89,7 @@ func ExtractStructFieldDescription(item reflect.Type) (result map[string]string)
 	}
 	return
 }
+
 func (rest *RestAPI) GenerateToDir(dir string) {
 	apiContent, typeContent := rest.Generate()
 	if len(apiContent) > 0 {
