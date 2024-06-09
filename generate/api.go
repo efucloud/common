@@ -62,11 +62,11 @@ type Parameters struct {
 
 func NewRestAPI(frontApiName string, generateTypescript bool) *RestAPI {
 	api := &RestAPI{
-		structTypes:        map[string]reflect.Type{},
-		apis:               map[string]ApiData{},
+		structTypes:        make(map[string]reflect.Type),
+		apis:               make(map[string]ApiData),
 		globalApiName:      frontApiName,
 		generateTypescript: generateTypescript,
-		files:              map[string]string{},
+		files:              make(map[string]string),
 	}
 	if len(api.globalApiName) == 0 {
 		api.globalApiName = GlobalApiName
