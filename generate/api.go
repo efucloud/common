@@ -34,6 +34,7 @@ type RestAPI struct {
 	globalApiName      string
 	generateTypescript bool
 	files              map[string]string
+	ignores            map[string]string
 }
 
 type ApiData struct {
@@ -71,6 +72,7 @@ func NewRestAPI(frontApiName string, generateTypescript bool) *RestAPI {
 		globalApiName:      frontApiName,
 		generateTypescript: generateTypescript,
 		files:              make(map[string]string),
+		ignores:            make(map[string]string),
 	}
 	if len(api.globalApiName) == 0 {
 		api.globalApiName = GlobalApiName
@@ -83,6 +85,12 @@ func (rest *RestAPI) AddRoute(route restful.Route) {
 func (rest *RestAPI) AddStruct(st reflect.Type) {
 	rest.structTypes[st.Name()] = st
 }
+func (rest *RestAPI) AddStructIgnores(ignores ...string) {
+	for _, item := range ignores {
+		rest.ignores[item] = item
+	}
+}
+
 func GetStructFieldDescription(item reflect.Type) string {
 	result, _ := json.Marshal(ExtractStructFieldDescription(item))
 	return string(result)
@@ -123,6 +131,9 @@ func (rest *RestAPI) Generate() (typeContent string) {
 		for _, item := range rest.structTypes {
 			typs.AddStruct(item)
 		}
+		for _, item := range rest.ignores {
+			typs.AddStructIgnores(item)
+		}
 		typeContent = typs.Generate()
 	}
 	// 生成api
@@ -135,8 +146,12 @@ func (rest *RestAPI) Generate() (typeContent string) {
 func (rest *RestAPI) generateOneApi(api ApiData) (content string) {
 	var description string
 
-	description += fmt.Sprintf("// %s\n", api.Doc)
-	description += fmt.Sprintf("// %s\n", api.Notes)
+	if len(api.Doc) > 0 {
+		description += fmt.Sprintf("// %s\n", api.Doc)
+	}
+	if api.Doc != api.Notes && len(api.Notes) > 0 {
+		description += fmt.Sprintf("// %s\n", api.Notes)
+	}
 	description += fmt.Sprintf("// 请求方法: %s\n", api.Method)
 	description += fmt.Sprintf("// 请求地址: %s\n", api.Path)
 	for code, data := range api.Response {
@@ -238,7 +253,7 @@ func (rest *RestAPI) ParserRoutes() {
 				if strings.Contains(p.DataType, ".") {
 					dt := strings.Split(p.DataType, ".")
 					if len(dt) >= 2 {
-						p.DataType = dt[len(dt)-2]
+						p.DataType = dt[len(dt)-1]
 					}
 				}
 			case restful.HeaderParameterKind:
@@ -252,15 +267,31 @@ func (rest *RestAPI) ParserRoutes() {
 			if route.ReadSample != nil {
 				read := reflect.ValueOf(route.ReadSample).Type()
 				if read != nil && read.Kind() != reflect.String {
-					rest.structTypes[read.Name()] = read
-					api.RequestModel = read.Name()
+					if read.Kind() != reflect.Slice {
+						k := strings.TrimPrefix(read.Name(), "*")
+						if strings.Contains(k, ".") {
+							sp := strings.Split(k, ".")
+							spLen := len(sp)
+							k = sp[spLen-1]
+						}
+						rest.structTypes[read.Name()] = read
+						api.RequestModel = k
+					}
 				}
 			}
 			if route.WriteSample != nil {
 				write := reflect.ValueOf(route.WriteSample).Type()
 				if write != nil && write.Kind() != reflect.String {
-					rest.structTypes[write.Name()] = write
-					api.ResponseModel = write.Name()
+					if write.Kind() != reflect.Slice {
+						k := strings.TrimPrefix(write.Name(), "*")
+						if strings.Contains(k, ".") {
+							sp := strings.Split(k, ".")
+							spLen := len(sp)
+							k = sp[spLen-1]
+						}
+						rest.structTypes[write.Name()] = write
+						api.ResponseModel = k
+					}
 				}
 			}
 			for _, res := range route.ResponseErrors {

@@ -16,6 +16,7 @@ type TypeScript struct {
 	consts      []Const
 	structMap   map[string]StructInfo
 	generates   map[string]bool
+	ignores     map[string]string
 }
 type Const struct {
 	Model       string
@@ -45,10 +46,15 @@ type FieldInfo struct {
 func (script *TypeScript) AddStruct(st reflect.Type) {
 	script.structTypes[strings.TrimPrefix(st.Name(), "*")] = st
 }
+func (script *TypeScript) AddStructIgnores(ignore string) {
+	script.ignores[ignore] = ignore
+}
+
 func NewTypeScript() *TypeScript {
 	script := &TypeScript{}
 	script.structTypes = make(map[string]reflect.Type)
 	script.kinds = make(map[string]string)
+	script.ignores = make(map[string]string)
 	script.generates = make(map[string]bool)
 	script.structMap = make(map[string]StructInfo)
 	script.kinds[reflect.Bool.String()] = "boolean"
@@ -134,6 +140,12 @@ func (script *TypeScript) Generate() (content string) {
 			if !field.Required {
 				content += "?"
 			}
+			if len(field.Kind) == 0 {
+				field.Kind = "any"
+			}
+			if _, exist := script.ignores[field.Kind]; exist {
+				field.Kind = fmt.Sprintf("any; // 忽略转换: %s，请人工处理该结构", field.Kind)
+			}
 			content += fmt.Sprintf(": %s;\n", field.Kind)
 		}
 		content += "}; \n"
@@ -144,7 +156,6 @@ func (script *TypeScript) Generate() (content string) {
 
 func (script *TypeScript) extractStructFields(item reflect.Type) (structInfo StructInfo) {
 	structInfo.Name = item.Name()
-
 	for i := 0; i < item.NumField(); i++ {
 		var field FieldInfo
 		//获取描述
