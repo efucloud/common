@@ -128,7 +128,7 @@ func (script *TypeScript) Generate() (content string) {
 				content += fmt.Sprintf("  // 可选值: %v\n", strings.Join(ev, ";"))
 			}
 			if len(field.Length) > 0 {
-				content += fmt.Sprintf("  // 长度: %s\n", field.Length)
+				content += fmt.Sprintf("  // 最大长度: %s\n", field.Length)
 			}
 			content += fmt.Sprintf("  %s", field.JsonName)
 			if !field.Required {
