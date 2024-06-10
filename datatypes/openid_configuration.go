@@ -24,20 +24,20 @@ import (
 )
 
 type OpenIDConfiguration struct {
-	Issuer                                 string      `json:"issuer" description:""`
-	AuthorizationEndpoint                  string      `json:"authorization_endpoint" description:""`
-	TokenEndpoint                          string      `json:"token_endpoint" description:""`
-	UserinfoEndpoint                       string      `json:"userinfo_endpoint" description:""`
-	JwksUri                                string      `json:"jwks_uri" description:""`
-	ResponseTypesSupported                 ArrayString `json:"response_types_supported" description:""`
-	ResponseModesSupported                 ArrayString `json:"response_modes_supported" description:""`
-	GrantTypesSupported                    ArrayString `json:"grant_types_supported" description:""`
-	SubjectTypesSupported                  ArrayString `json:"subject_types_supported" description:""`
-	IdTokenSigningAlgValuesSupported       ArrayString `json:"id_token_signing_alg_values_supported" description:""`
-	ScopesSupported                        ArrayString `json:"scopes_supported" description:""`
-	ClaimsSupported                        ArrayString `json:"claims_supported" description:""`
-	RequestParameterSupported              bool        `json:"request_parameter_supported" description:""`
-	RequestObjectSigningAlgValuesSupported ArrayString `json:"request_object_signing_alg_values_supported" description:""`
+	Issuer                                 string   `json:"issuer" description:""`
+	AuthorizationEndpoint                  string   `json:"authorization_endpoint" description:""`
+	TokenEndpoint                          string   `json:"token_endpoint" description:""`
+	UserinfoEndpoint                       string   `json:"userinfo_endpoint" description:""`
+	JwksUri                                string   `json:"jwks_uri" description:""`
+	ResponseTypesSupported                 []string `json:"response_types_supported" description:""`
+	ResponseModesSupported                 []string `json:"response_modes_supported" description:""`
+	GrantTypesSupported                    []string `json:"grant_types_supported" description:""`
+	SubjectTypesSupported                  []string `json:"subject_types_supported" description:""`
+	IdTokenSigningAlgValuesSupported       []string `json:"id_token_signing_alg_values_supported" description:""`
+	ScopesSupported                        []string `json:"scopes_supported" description:""`
+	ClaimsSupported                        []string `json:"claims_supported" description:""`
+	RequestParameterSupported              bool     `json:"request_parameter_supported" description:""`
+	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported" description:""`
 }
 
 func (OpenIDConfiguration) GormDataType() string {

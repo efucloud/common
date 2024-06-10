@@ -18,8 +18,6 @@ package models
 
 import (
 	"github.com/efucloud/common"
-	dt "github.com/efucloud/common/datatypes"
-	"github.com/go-playground/validator/v10"
 	"time"
 )
 
@@ -69,7 +67,9 @@ func (t *Organization) Validate() (err error) {
 func mfaValidate(fl validator.FieldLevel) bool {
 	allows := []string{"totp", "sms", "email"}
 	if fl.Field().Interface() != nil {
-		items := fl.Field().Interface().(dt.ArrayString)
+		items := fl.Field().Interface().
+		(dt.
+		[]string)
 		for _, item := range items {
 			if common.StringKeyInArray(item, allows) {
 				return true
@@ -82,7 +82,9 @@ func mfaValidate(fl validator.FieldLevel) bool {
 func supportLoginsValidate(fl validator.FieldLevel) bool {
 	allows := []string{"username", "phone", "email", "phoneCode", "emailCode", "oidc", "ldap"}
 	if fl.Field().Interface() != nil {
-		items := fl.Field().Interface().(dt.ArrayString)
+		items := fl.Field().Interface().
+		(dt.
+		[]string)
 		for _, item := range items {
 			if common.StringKeyInArray(item, allows) {
 				return true

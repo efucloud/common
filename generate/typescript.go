@@ -75,7 +75,7 @@ func NewTypeScript() *TypeScript {
 	script.kinds["Time"] = "string"
 	script.kinds["JSONMap"] = "{[key: string]: string}"
 	script.kinds["map[string]string"] = "{[key: string]: string}"
-	script.kinds["ArrayString"] = "string[]"
+	script.kinds["[]string"] = "string[]"
 	script.kinds["[]string"] = "string[]"
 	script.kinds["ArrayUint"] = "number[]"
 	script.kinds["map[string]interface {}"] = "{[key: string]: any}"
