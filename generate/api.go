@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/efucloud/common"
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	restful "github.com/emicklei/go-restful/v3"
 
@@ -19,10 +20,11 @@ import (
 const apiHasPathParamsTemplate = "_{{_ .description _}}_" +
 	"export const _{{_ .functionName _}}_  = async (params?: any) => {\n" +
 	"    _{{_ if .extractPathParams _}}_ _{{_  .extractPathParams _}}_ _{{_ end _}}_\n" +
-	"    return request(`_{{_ .api _}}_`, { method: '_{{_ .method _}}_' _{{_ if .params _}}_ , params: _{{_ .params _}}_ _{{_ end _}}_ _{{_ if .body _}}_ , body: _{{_ .body _}}_ _{{_ end _}}_ });\n" +
+	"    return request_{{_ if .responseModel _}}_<API._{{_ .responseModel _}}_>_{{_ end _}}_(`_{{_ .api _}}_`, { method: '_{{_ .method _}}_' _{{_ if .params _}}_ , params: _{{_ .params _}}_ _{{_ end _}}_ _{{_ if .body _}}_ , body: _{{_ .body _}}_ _{{_ end _}}_ });\n" +
 	"};\n"
 
 const GlobalApiName = "GlobalApiName"
+const ident = "    "
 
 type RestAPI struct {
 	// 从接口中自动提取
@@ -35,14 +37,16 @@ type RestAPI struct {
 }
 
 type ApiData struct {
-	DocumentName string
-	Name         string
-	Doc          string
-	Notes        string
-	Path         string
-	Method       string
-	Parameters   map[string]Parameters
-	Response     map[int]string
+	DocumentName  string
+	RequestModel  string
+	ResponseModel string
+	Name          string
+	Doc           string
+	Notes         string
+	Path          string
+	Method        string
+	Parameters    map[string]Parameters
+	Response      map[int]string
 }
 
 func (api ApiData) String() string {
@@ -75,6 +79,9 @@ func NewRestAPI(frontApiName string, generateTypescript bool) *RestAPI {
 }
 func (rest *RestAPI) AddRoute(route restful.Route) {
 	rest.routes = append(rest.routes, route)
+}
+func (rest *RestAPI) AddStruct(st reflect.Type) {
+	rest.structTypes[st.Name()] = st
 }
 func GetStructFieldDescription(item reflect.Type) string {
 	result, _ := json.Marshal(ExtractStructFieldDescription(item))
@@ -178,6 +185,9 @@ func (rest *RestAPI) generateOneApi(api ApiData) (content string) {
 			params["params"] = "params"
 		}
 	}
+	if len(api.ResponseModel) > 0 && !common.StringKeyInArray(api.ResponseModel, []string{"string", "uint", "bool", "float64"}) {
+		params["responseModel"] = api.ResponseModel
+	}
 	t, _ := template.New(time.Now().String()).Delims("_{{_", "_}}_").Parse(apiHasPathParamsTemplate)
 	b := new(bytes.Buffer)
 	err := t.Execute(b, params)
@@ -225,6 +235,12 @@ func (rest *RestAPI) ParserRoutes() {
 				p.Position = "query"
 			case restful.BodyParameterKind:
 				p.Position = "body"
+				if strings.Contains(p.DataType, ".") {
+					dt := strings.Split(p.DataType, ".")
+					if len(dt) >= 2 {
+						p.DataType = dt[len(dt)-2]
+					}
+				}
 			case restful.HeaderParameterKind:
 				p.Position = "header"
 			case restful.FormParameterKind:
@@ -235,20 +251,25 @@ func (rest *RestAPI) ParserRoutes() {
 			api.Parameters[p.Name] = p
 			if route.ReadSample != nil {
 				read := reflect.ValueOf(route.ReadSample).Type()
-				if read != nil {
+				if read != nil && read.Kind() != reflect.String {
 					rest.structTypes[read.Name()] = read
+					api.RequestModel = read.Name()
 				}
 			}
 			if route.WriteSample != nil {
 				write := reflect.ValueOf(route.WriteSample).Type()
-				if write != nil {
+				if write != nil && write.Kind() != reflect.String {
 					rest.structTypes[write.Name()] = write
+					api.ResponseModel = write.Name()
 				}
 			}
 			for _, res := range route.ResponseErrors {
 				if res.Code == http.StatusOK || res.Code == http.StatusCreated {
 					if res.Model != nil {
 						successRes := reflect.ValueOf(res.Model).Type()
+						if len(api.ResponseModel) == 0 {
+							api.ResponseModel = successRes.Name()
+						}
 						if successRes != nil {
 							if successRes.Kind().String() == reflect.Pointer.String() || successRes.Kind().String() == reflect.Struct.String() {
 								rest.structTypes[successRes.Name()] = successRes

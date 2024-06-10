@@ -81,34 +81,34 @@ func (script *TypeScript) GenerateToDir(dir string) {
 	_ = os.WriteFile(path.Join(dir, time.Now().Format(time.DateOnly)+"types.d.ts"), []byte(script.Generate()), os.ModePerm)
 }
 func (script *TypeScript) Generate() (content string) {
-	var anys []string
 	for _, item := range script.structTypes {
 		script.structMap[item.Name()] = script.extractStructFields(item)
 		script.generates[item.Name()] = true
 	}
 	//生成常量
+	content += "declare namespace API {\n"
 	for _, item := range script.consts {
-		content += fmt.Sprintf("// %s \n", item.Description)
+		content += fmt.Sprintf("%s// %s \n", ident, item.Description)
 		if item.Type == "string" {
 			var values []string
 			for _, v := range item.Enum {
 				values = append(values, fmt.Sprintf("'%v'", v))
 			}
-			content += fmt.Sprintf("type %s = %s ;\n", item.Name, strings.Join(values, "|"))
+			content += fmt.Sprintf("%stype %s = %s ;\n", ident, item.Name, strings.Join(values, "|"))
 
 		} else {
 			var values []string
 			for _, v := range item.Enum {
 				values = append(values, fmt.Sprintf("%v", v))
 			}
-			content += fmt.Sprintf("type %s = %s ;\n", item.Name, strings.Join(values, "|"))
+			content += fmt.Sprintf("%stype %s = %s ;\n", ident, item.Name, strings.Join(values, "|"))
 		}
 	}
 	for _, item := range script.structMap {
 		if item.Name == "StructField" {
 			continue
 		}
-		content += fmt.Sprintf("// %s %s \n", item.Name, item.Description)
+		content += fmt.Sprintf("%s// %s %s \n", ident, item.Name, item.Description)
 		content += fmt.Sprintf("type %s = { \n", item.Name)
 		for _, field := range item.Fields {
 			if len(strings.TrimSpace(field.JsonName)) == 0 {
@@ -134,47 +134,11 @@ func (script *TypeScript) Generate() (content string) {
 			if !field.Required {
 				content += "?"
 			}
-			if _, exist := script.kinds[field.Kind]; !exist {
-				if _, ex := script.structTypes[field.Kind]; !ex {
-					anys = append(anys, field.Kind)
-					content += ": any;\n"
-					continue
-				}
-			}
 			content += fmt.Sprintf(": %s;\n", field.Kind)
 		}
 		content += "}; \n"
 	}
-	for _, a := range anys {
-		if a == "LdapConfig" {
-			fmt.Println("LdapConfig")
-		}
-		if len(a) == 0 {
-			continue
-		}
-		ex := false
-		for _, v := range script.kinds {
-			if v == a {
-				ex = true
-			}
-		}
-		if !ex {
-			for _, v := range script.consts {
-				if v.Name == a {
-					ex = true
-				}
-			}
-		}
-		if _, v := script.generates[a]; v {
-			ex = true
-		}
-		if !ex {
-			if a == "LdapConfig" {
-				fmt.Sprintf("")
-			}
-			content += fmt.Sprintf("type %s = any;\n", a)
-		}
-	}
+	content += "}\n"
 	return content
 }
 
@@ -188,7 +152,6 @@ func (script *TypeScript) extractStructFields(item reflect.Type) (structInfo Str
 			structInfo.Description = item.Field(i).Tag.Get("description")
 			continue
 		}
-
 		field.Name = item.Field(i).Name
 		jsonName := item.Field(i).Tag.Get("json")
 		field.JsonName = jsonName
@@ -270,17 +233,7 @@ func (script *TypeScript) extractStructFields(item reflect.Type) (structInfo Str
 					if _, exist := script.structTypes[field.Kind]; !exist {
 						if _, ex := script.structMap[field.Kind]; !ex {
 							if jsonName == ",inline" || jsonName == "metadata,omitempty" {
-								// k8s
-								if common.StringKeyInArray(field.Kind, []string{"TypeMeta", "ObjectMeta"}) {
-									field.Kind = "any"
-								} else {
-									if reflect.TypeOf(item.Field(i)).Name() == "StructField" {
-										field.Kind = item.Field(i).Name
-									} else {
-										script.structMap[field.Kind] = script.extractStructFields(reflect.TypeOf(item.Field(i)))
-
-									}
-								}
+								field.Kind = "any"
 							} else {
 								script.structMap[field.Kind] = script.extractStructFields(reflect.TypeOf(item.Field(i)))
 							}
@@ -288,22 +241,23 @@ func (script *TypeScript) extractStructFields(item reflect.Type) (structInfo Str
 						//script.structTypes[field.Kind] =
 					}
 				case reflect.Slice:
-					field.Kind = "any"
+					field.Kind = fmt.Sprintf("%s[]", kindName)
 				case reflect.Pointer:
 					field.Kind = kindName
 					if _, exist := script.structTypes[field.Kind]; !exist {
 						if _, ex := script.structMap[field.Kind]; !ex {
 							if jsonName == ",inline" || jsonName == "metadata,omitempty" {
+								field.Kind = "any"
 								//k8s
-								if common.StringKeyInArray(field.Kind, []string{"TypeMeta", "ObjectMeta"}) {
-									field.Kind = "any"
-								} else {
-									if item.Field(i).Type.Name() == "StructField" {
-										field.Kind = item.Field(i).Name
-									} else {
-										script.structMap[field.Kind] = script.extractStructFields(item.Field(i).Type.Elem())
-									}
-								}
+								//if common.StringKeyInArray(field.Kind, []string{"TypeMeta", "ObjectMeta"}) {
+								//	field.Kind = "any"
+								//} else {
+								//	if item.Field(i).Type.Name() == "StructField" {
+								//		field.Kind = item.Field(i).Name
+								//	} else {
+								//		script.structMap[field.Kind] = script.extractStructFields(item.Field(i).Type.Elem())
+								//	}
+								//}
 							} else {
 								script.structMap[field.Kind] = script.extractStructFields(item.Field(i).Type.Elem())
 							}
@@ -313,7 +267,9 @@ func (script *TypeScript) extractStructFields(item reflect.Type) (structInfo Str
 			}
 
 		}
-		structInfo.Fields = append(structInfo.Fields, field)
+		if structInfo.Name != "StructField" {
+			structInfo.Fields = append(structInfo.Fields, field)
+		}
 	}
 	return
 }
