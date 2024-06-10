@@ -174,8 +174,8 @@ func (script *TypeScript) extractStructFields(item reflect.Type) (structInfo Str
 					case "default":
 						field.Default = sp[1]
 					case "type":
-						if strings.HasPrefix(sp[0], "varchar(") {
-							lens := strings.TrimPrefix(sp[0], "varchar(")
+						if strings.HasPrefix(sp[1], "varchar(") {
+							lens := strings.TrimPrefix(sp[1], "varchar(")
 							if len(lens) > 2 {
 								field.Length = lens[:len(lens)-2]
 							}
