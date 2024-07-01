@@ -52,14 +52,14 @@ func (a ApiInfo) Tags() []string {
 	return []string{a.Tag}
 }
 
-func GetRequestPaginationInformation(req *restful.Request) (page int, size int, order string) {
-	page = String2Int(req.QueryParameter("page"), DefaultPage)
-	size = String2Int(req.QueryParameter("size"), DefaultPageSize)
+func GetRequestPaginationInformation(req *restful.Request) (current int, pageSize int, order string) {
+	current = String2Int(req.QueryParameter("current"), DefaultPage)
+	pageSize = String2Int(req.QueryParameter("pageSize"), DefaultPageSize)
 	order = req.QueryParameter("order")
 	if len(order) == 0 {
 		order = DefaultOrder
 	}
-	return page, size, order
+	return current, pageSize, order
 }
 
 type QueryParam struct {

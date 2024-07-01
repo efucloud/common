@@ -1,6 +1,6 @@
 package generate
 
-type PageForm struct {
+type ViewForm struct {
 }
 
 var ProForm = map[string]string{

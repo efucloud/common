@@ -1,6 +1,6 @@
 package generate
 
-type PageTable struct {
+type ViewTable struct {
 	ModelRef string   `gorm:"type:varchar(255)" json:"modelRef" yaml:"modelRef" description:"关联模型名"`
 	Model    Model    `json:"model" yaml:"model" description:""`
 	Searches []Search `json:"searches" yaml:"searches" description:"支持的搜索项"`
