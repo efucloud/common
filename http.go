@@ -246,12 +246,9 @@ func RequestQuerySearch(value, queryType string, fields []string, queryParam *Qu
 	}
 }
 
-func RequestQueryEqual(name, paramType, queryType string, value string, queryParam *QueryParam) {
-	if len(strings.TrimSpace(value)) == 0 || len(strings.TrimSpace(name)) == 0 {
-		return
-	}
+func RequestQueryEqual(name, paramType, queryType string, value interface{}, queryParam *QueryParam) {
 	if paramType == ParamTypeNumber {
-		v := StringsToUint(value)
+		v := StringsToUint(fmt.Sprintf("%v", value))
 		if v > 0 {
 			if queryParam.WhereQuery == "" {
 				queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
@@ -260,7 +257,7 @@ func RequestQueryEqual(name, paramType, queryType string, value string, queryPar
 			}
 			queryParam.WhereArgs = append(queryParam.WhereArgs, v)
 		}
-	} else if paramType == ParamTypeString || paramType == "" {
+	} else {
 		if queryParam.WhereQuery == "" {
 			queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
 		} else {
