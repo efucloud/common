@@ -159,7 +159,7 @@ func RequestQuery(name, paramType, queryType string, req *restful.Request, query
 		nameList := strings.Split(strings.TrimPrefix(name, "search:"), ";")
 		var sqlList []string
 		for _, item := range nameList {
-			sqlList = append(sqlList, fmt.Sprintf(" %s LIKE ?", CamelString2Snake(item)))
+			sqlList = append(sqlList, fmt.Sprintf(" %s %s ?", CamelString2Snake(item), queryType))
 			queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", value))
 		}
 		if queryParam.WhereQuery == "" {
