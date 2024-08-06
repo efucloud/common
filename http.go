@@ -154,6 +154,20 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 
 // RequestQuery paramType: string,number queryType: eq,like
 func RequestQuery(name, paramType, queryType string, req *restful.Request, queryParam *QueryParam) {
+	if strings.HasSuffix(name, "search:") {
+		value := req.QueryParameter("search")
+		nameList := strings.Split(strings.TrimSuffix(name, "search:"), ";")
+		var sqlList []string
+		for _, item := range nameList {
+			sqlList = append(sqlList, fmt.Sprintf(" %s LIKE ?", CamelString2Snake(item)))
+			queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", value))
+		}
+		if queryParam.WhereQuery == "" {
+			queryParam.WhereQuery = strings.Join(sqlList, " OR ")
+		} else {
+			queryParam.WhereQuery += fmt.Sprintf(" AND  %s", strings.Join(sqlList, " OR "))
+		}
+	}
 	value := req.QueryParameter(name)
 	nv := strings.TrimSpace(value)
 	if nv != "" {
