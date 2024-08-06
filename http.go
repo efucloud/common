@@ -154,9 +154,9 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 
 // RequestQuery paramType: string,number queryType: eq,like
 func RequestQuery(name, paramType, queryType string, req *restful.Request, queryParam *QueryParam) {
-	if strings.HasSuffix(name, "search:") {
+	if strings.HasPrefix(name, "search:") {
 		value := req.QueryParameter("search")
-		nameList := strings.Split(strings.TrimSuffix(name, "search:"), ";")
+		nameList := strings.Split(strings.TrimPrefix(name, "search:"), ";")
 		var sqlList []string
 		for _, item := range nameList {
 			sqlList = append(sqlList, fmt.Sprintf(" %s LIKE ?", CamelString2Snake(item)))
