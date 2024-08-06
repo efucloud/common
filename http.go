@@ -163,9 +163,9 @@ func RequestQuery(name, paramType, queryType string, req *restful.Request, query
 			queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", value))
 		}
 		if queryParam.WhereQuery == "" {
-			queryParam.WhereQuery = strings.Join(sqlList, " OR ")
+			queryParam.WhereQuery = fmt.Sprintf("(%s)", strings.Join(sqlList, " OR "))
 		} else {
-			queryParam.WhereQuery += fmt.Sprintf(" AND  %s", strings.Join(sqlList, " OR "))
+			queryParam.WhereQuery += fmt.Sprintf(" AND ( %s )", strings.Join(sqlList, " OR "))
 		}
 	}
 	value := req.QueryParameter(name)
