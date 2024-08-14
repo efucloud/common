@@ -280,6 +280,8 @@ func notOneOf(fl validator.FieldLevel) bool {
 
 	var v string
 	switch field.Kind() {
+	case reflect.Slice:
+		v = field.String()
 	case reflect.String:
 		v = field.String()
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
