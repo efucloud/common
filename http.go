@@ -32,6 +32,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -105,6 +106,8 @@ func HttpRequest(client *http.Client, method, address string, headers, cookies m
 type ResponseError struct {
 	Message    string `json:"message" yaml:"message" description:"错误英文编码"`
 	Detail     string `json:"detail" yaml:"detail" description:"错误详情信息"`
+	File       string `json:"file" description:"错误文件位置"`
+	Line       int    `json:"line" description:"错误行数"`
 	Alert      string `json:"alert" yaml:"alert" description:"支持I18N的提示信息"`
 	RequestURI string `json:"requestUri" description:"当前请求地址"`
 }
@@ -139,12 +142,17 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 	if detail.ResponseCode == 0 {
 		detail.ResponseCode = http.StatusInternalServerError
 	}
+
 	resp.Header().Add("X-Content-Type-Options", "nosniff")
 	resp.Header().Add("X-XSS-Protection", "1; mode=block")
 	var body ResponseError
 	body.Message = detail.MsgCode
 	if detail.Err != nil {
 		body.Detail = detail.Err.Error()
+	}
+	if _, file, line, ok := runtime.Caller(detail.Depth); ok {
+		body.File = file
+		body.Line = line
 	}
 	body.RequestURI = req.Request.RequestURI
 	body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, detail.MsgCode)

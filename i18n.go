@@ -108,6 +108,7 @@ func ValidateTransCtx(ctx context.Context, unTrans *ut.UniversalTranslator, ctxL
 }
 
 type ErrorData struct {
+	Depth        int                    `json:"-" description:"深度"`
 	Lang         string                 `json:"lang"`         // 语言
 	ResponseCode int                    `json:"responseCode"` // 响应头编码
 	Err          error                  `json:"error"`        // 错误信息

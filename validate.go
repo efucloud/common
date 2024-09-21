@@ -34,7 +34,7 @@ import (
 var RFC1123Reg *regexp.Regexp
 
 func init() {
-	RFC1123Reg = regexp.MustCompile(`[a-z]([-a-z0-9]*[a-z0-9])?`)
+	RFC1123Reg = regexp.MustCompile(`[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*`)
 }
 func ValidateTime(fl validator.FieldLevel) bool {
 	_, err := time.Parse(TimeFormat, fl.Field().String())
@@ -48,7 +48,6 @@ func ValidateRFC1123Reg(fl validator.FieldLevel) bool {
 }
 func NotBlank(fl validator.FieldLevel) bool {
 	field := fl.Field()
-
 	switch field.Kind() {
 	case reflect.String:
 		return len(strings.TrimSpace(field.String())) > 0
