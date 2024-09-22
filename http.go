@@ -104,12 +104,15 @@ func HttpRequest(client *http.Client, method, address string, headers, cookies m
 }
 
 type ResponseError struct {
-	Message    string `json:"message" yaml:"message" description:"错误英文编码"`
-	Detail     string `json:"detail" yaml:"detail" description:"错误详情信息"`
-	File       string `json:"file" description:"错误文件位置"`
-	Line       int    `json:"line" description:"错误行数"`
-	Alert      string `json:"alert" yaml:"alert" description:"支持I18N的提示信息"`
-	RequestURI string `json:"requestUri" description:"当前请求地址"`
+	Message    string        `json:"message" yaml:"message" description:"错误英文编码"`
+	Detail     string        `json:"detail" yaml:"detail" description:"错误详情信息"`
+	Links      []ErrorSource `json:"links,omitempty" description:""`
+	Alert      string        `json:"alert" yaml:"alert" description:"支持I18N的提示信息"`
+	RequestURI string        `json:"requestUri" description:"当前请求地址"`
+}
+type ErrorSource struct {
+	File string `json:"file" description:""`
+	Line int    `json:"line" description:""`
 }
 type AuthRedirectInfo struct {
 	Message               string                 `json:"message" description:"提示信息"`
@@ -150,10 +153,17 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 	if detail.Err != nil {
 		body.Detail = detail.Err.Error()
 	}
-	if _, file, line, ok := runtime.Caller(detail.Depth); ok {
-		body.File = file
-		body.Line = line
+	depth := 1
+
+	for {
+		if _, file, line, ok := runtime.Caller(depth); ok {
+			body.Links = append(body.Links, ErrorSource{File: file, Line: line})
+		} else {
+			break
+		}
+		depth += 1
 	}
+
 	body.RequestURI = req.Request.RequestURI
 	body.Alert, _ = GetLocaleMessage(bundle, detail.Params, detail.Lang, detail.MsgCode)
 	_ = resp.WriteHeaderAndJson(detail.ResponseCode, body, restful.MIME_JSON)
