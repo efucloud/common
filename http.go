@@ -162,6 +162,9 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 			break
 		}
 		depth += 1
+		if depth > 5 {
+			break
+		}
 	}
 
 	body.RequestURI = req.Request.RequestURI
