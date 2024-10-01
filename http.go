@@ -175,7 +175,7 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 
 // RequestQuery paramType: string,number queryType: eq,like
 func RequestQuery(name, paramType, queryType string, req *restful.Request, queryParam *QueryParam) {
-	if strings.HasPrefix(name, "search:") && length(name) > length("search:") {
+	if strings.HasPrefix(name, "search:") && len(name) > len("search:") {
 		value := req.QueryParameter("search")
 		nameList := strings.Split(strings.TrimPrefix(name, "search:"), ";")
 		var sqlList []string
