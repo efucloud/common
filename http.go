@@ -284,14 +284,12 @@ func RequestQuerySearch(value, queryType string, fields []string, queryParam *Qu
 func RequestQueryEqual(name, paramType, queryType string, value interface{}, queryParam *QueryParam) {
 	if paramType == ParamTypeNumber {
 		v := StringsToUint(fmt.Sprintf("%v", value))
-		if v > 0 {
-			if queryParam.WhereQuery == "" {
-				queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
-			} else {
-				queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
-			}
-			queryParam.WhereArgs = append(queryParam.WhereArgs, v)
+		if queryParam.WhereQuery == "" {
+			queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
+		} else {
+			queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
 		}
+		queryParam.WhereArgs = append(queryParam.WhereArgs, v)
 	} else {
 		if queryParam.WhereQuery == "" {
 			queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
