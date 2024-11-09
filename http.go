@@ -281,23 +281,22 @@ func RequestQuerySearch(value, queryType string, fields []string, queryParam *Qu
 	}
 }
 
-func RequestQueryEqual(name, paramType, queryType string, value interface{}, queryParam *QueryParam) {
-	if paramType == ParamTypeNumber {
-		v := StringsToUint(fmt.Sprintf("%v", value))
-		if queryParam.WhereQuery == "" {
-			queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
-		} else {
-			queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
-		}
-		queryParam.WhereArgs = append(queryParam.WhereArgs, v)
+func QueryEqual(name string, value interface{}, queryParam *QueryParam) {
+	if queryParam.WhereQuery == "" {
+		queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
 	} else {
-		if queryParam.WhereQuery == "" {
-			queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
-		} else {
-			queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
-		}
-		queryParam.WhereArgs = append(queryParam.WhereArgs, value)
+		queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
 	}
+	queryParam.WhereArgs = append(queryParam.WhereArgs, value)
+}
+
+func QueryIn(name string, values []interface{}, queryParam *QueryParam) {
+	if queryParam.WhereQuery == "" {
+		queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
+	} else {
+		queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?) ", CamelString2Snake(name))
+	}
+	queryParam.WhereArgs = append(queryParam.WhereArgs, values)
 }
 
 func TokenErr(resp *restful.Response, typ, description string, statusCode int) error {
