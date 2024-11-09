@@ -290,7 +290,7 @@ func QueryEqual(name string, value interface{}, queryParam *QueryParam) {
 	queryParam.WhereArgs = append(queryParam.WhereArgs, value)
 }
 
-func QueryIn(name string, values []interface{}, queryParam *QueryParam) {
+func QueryIn(name string, values interface{}, queryParam *QueryParam) {
 	if queryParam.WhereQuery == "" {
 		queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
 	} else {
