@@ -175,79 +175,81 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 
 // RequestQuery paramType: string,number queryType: eq,like
 func RequestQuery(name, paramType, queryType string, req *restful.Request, queryParam *QueryParam) {
-	if strings.HasPrefix(name, "search:") {
-		value := req.QueryParameter("search")
-		nameList := strings.Split(strings.TrimPrefix(name, "search:"), ";")
-		var sqlList []string
-		for _, item := range nameList {
-			sqlList = append(sqlList, fmt.Sprintf(" %s %s ?", CamelString2Snake(item), queryType))
-			queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", value))
+	if queryType == QueryTypeIn {
+		valueSlice := req.QueryParameters(fmt.Sprintf("%s[]", name))
+		if paramType == ParamTypeStringSlice {
+			if queryParam.WhereQuery == "" {
+				queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
+			} else {
+				queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
+			}
+			queryParam.WhereArgs = append(queryParam.WhereArgs, valueSlice)
+		} else if paramType == ParamTypeNumber {
+			if queryParam.WhereQuery == "" {
+				queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
+			} else {
+				queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
+			}
+			queryParam.WhereArgs = append(queryParam.WhereArgs, StringsToUints(valueSlice))
 		}
-		if queryParam.WhereQuery == "" {
-			queryParam.WhereQuery = fmt.Sprintf("(%s)", strings.Join(sqlList, " OR "))
-		} else {
-			queryParam.WhereQuery += fmt.Sprintf(" AND ( %s )", strings.Join(sqlList, " OR "))
+	} else {
+		if strings.HasPrefix(name, "search:") {
+			value := req.QueryParameter("search")
+			nameList := strings.Split(strings.TrimPrefix(name, "search:"), ";")
+			var sqlList []string
+			for _, item := range nameList {
+				sqlList = append(sqlList, fmt.Sprintf(" %s %s ?", CamelString2Snake(item), queryType))
+				queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", value))
+			}
+			if queryParam.WhereQuery == "" {
+				queryParam.WhereQuery = fmt.Sprintf("(%s)", strings.Join(sqlList, " OR "))
+			} else {
+				queryParam.WhereQuery += fmt.Sprintf(" AND ( %s )", strings.Join(sqlList, " OR "))
+			}
 		}
-	}
-	value := req.QueryParameter(name)
-	nv := strings.TrimSpace(value)
-	if nv != "" {
-		//相等可以是字符或者数字
-		if queryType == "" || queryType == QueryTypeEqual {
-			if paramType == ParamTypeNumber {
-				v := StringsToUint(nv)
-				if v > 0 {
+		value := req.QueryParameter(name)
+		nv := strings.TrimSpace(value)
+		if nv != "" {
+			//相等可以是字符或者数字
+			if queryType == "" || queryType == QueryTypeEqual {
+				if paramType == ParamTypeNumber {
+					v := StringsToUint(nv)
+					if v > 0 {
+						if queryParam.WhereQuery == "" {
+							queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
+						} else {
+							queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
+						}
+						queryParam.WhereArgs = append(queryParam.WhereArgs, v)
+					}
+				} else if paramType == ParamTypeString || paramType == "" {
 					if queryParam.WhereQuery == "" {
 						queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
 					} else {
 						queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
 					}
-					queryParam.WhereArgs = append(queryParam.WhereArgs, v)
+					queryParam.WhereArgs = append(queryParam.WhereArgs, nv)
+				} else if paramType == ParamTypeBool {
+					if queryParam.WhereQuery == "" {
+						queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
+					} else {
+						queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
+					}
+					if strings.TrimSpace(nv) == "0" || strings.TrimSpace(strings.ToUpper(nv)) == "F" || strings.TrimSpace(strings.ToUpper(nv)) == "FALSE" {
+						queryParam.WhereArgs = append(queryParam.WhereArgs, 0)
+					} else {
+						queryParam.WhereArgs = append(queryParam.WhereArgs, 1)
+					}
 				}
-			} else if paramType == ParamTypeString || paramType == "" {
+				// like 只能为字符串
+			} else if queryType == QueryTypeLike {
 				if queryParam.WhereQuery == "" {
-					queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
+					queryParam.WhereQuery = fmt.Sprintf(" %s LIKE  ? ", CamelString2Snake(name))
 				} else {
-					queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
+					queryParam.WhereQuery += fmt.Sprintf(" AND %s LIKE  ? ", CamelString2Snake(name))
 				}
-				queryParam.WhereArgs = append(queryParam.WhereArgs, nv)
-			} else if paramType == ParamTypeBool {
-				if queryParam.WhereQuery == "" {
-					queryParam.WhereQuery = fmt.Sprintf(" %s = ? ", CamelString2Snake(name))
-				} else {
-					queryParam.WhereQuery += fmt.Sprintf(" AND %s = ? ", CamelString2Snake(name))
-				}
-				if strings.TrimSpace(nv) == "0" || strings.TrimSpace(strings.ToUpper(nv)) == "F" || strings.TrimSpace(strings.ToUpper(nv)) == "FALSE" {
-					queryParam.WhereArgs = append(queryParam.WhereArgs, 0)
-				} else {
-					queryParam.WhereArgs = append(queryParam.WhereArgs, 1)
-				}
-			}
-			// like 只能为字符串
-		} else if queryType == QueryTypeLike {
-			if queryParam.WhereQuery == "" {
-				queryParam.WhereQuery = fmt.Sprintf(" %s LIKE  ? ", CamelString2Snake(name))
-			} else {
-				queryParam.WhereQuery += fmt.Sprintf(" AND %s LIKE  ? ", CamelString2Snake(name))
-			}
-			queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", nv))
+				queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", nv))
 
-		} else if queryType == QueryTypeIn {
-			valueSlice := req.QueryParameters(name)
-			if paramType == ParamTypeStringSlice {
-				if queryParam.WhereQuery == "" {
-					queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
-				} else {
-					queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
-				}
-				queryParam.WhereArgs = append(queryParam.WhereArgs, valueSlice)
-			} else if paramType == ParamTypeNumber {
-				if queryParam.WhereQuery == "" {
-					queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
-				} else {
-					queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
-				}
-				queryParam.WhereArgs = append(queryParam.WhereArgs, StringsToUints(valueSlice))
 			}
 		}
 	}
