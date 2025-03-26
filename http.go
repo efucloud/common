@@ -177,20 +177,22 @@ func ResponseErrorMessage(ctx context.Context, req *restful.Request, resp *restf
 func RequestQuery(name, paramType, queryType string, req *restful.Request, queryParam *QueryParam) {
 	if queryType == QueryTypeIn {
 		valueSlice := req.QueryParameters(fmt.Sprintf("%s[]", name))
-		if paramType == ParamTypeStringSlice {
-			if queryParam.WhereQuery == "" {
-				queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
-			} else {
-				queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
+		if len(valueSlice) > 0 {
+			if paramType == ParamTypeStringSlice {
+				if queryParam.WhereQuery == "" {
+					queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
+				} else {
+					queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
+				}
+				queryParam.WhereArgs = append(queryParam.WhereArgs, valueSlice)
+			} else if paramType == ParamTypeNumber {
+				if queryParam.WhereQuery == "" {
+					queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
+				} else {
+					queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
+				}
+				queryParam.WhereArgs = append(queryParam.WhereArgs, StringsToUints(valueSlice))
 			}
-			queryParam.WhereArgs = append(queryParam.WhereArgs, valueSlice)
-		} else if paramType == ParamTypeNumber {
-			if queryParam.WhereQuery == "" {
-				queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
-			} else {
-				queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
-			}
-			queryParam.WhereArgs = append(queryParam.WhereArgs, StringsToUints(valueSlice))
 		}
 	} else {
 		if strings.HasPrefix(name, "search:") {
