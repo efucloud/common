@@ -206,7 +206,7 @@ func RequestQuery(name, paramType, queryType string, req *restful.Request, query
 					queryParam.WhereQuery += fmt.Sprintf(" AND %s IN (?)", CamelString2Snake(name))
 				}
 				queryParam.WhereArgs = append(queryParam.WhereArgs, valueSlice)
-			} else if paramType == ParamTypeNumber {
+			} else if paramType == ParamTypeNumberSlice {
 				if queryParam.WhereQuery == "" {
 					queryParam.WhereQuery = fmt.Sprintf(" %s IN (?) ", CamelString2Snake(name))
 				} else {
