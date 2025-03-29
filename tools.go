@@ -35,6 +35,10 @@ import (
 	"strings"
 )
 
+// Ptr is a helper that returns a pointer to v.
+func Ptr[T any](v T) *T {
+	return &v
+}
 func GetAllFiles(dirPath string) (dirs []string, files []string, err error) {
 	fs, err := os.ReadDir(dirPath)
 	if err != nil {
