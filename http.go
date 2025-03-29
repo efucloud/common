@@ -266,12 +266,14 @@ func RequestQuery(name, paramType, queryType string, req *restful.Request, query
 				}
 				// like 只能为字符串
 			} else if queryType == QueryTypeLike {
-				if queryParam.WhereQuery == "" {
-					queryParam.WhereQuery = fmt.Sprintf(" %s LIKE  ? ", CamelString2Snake(name))
-				} else {
-					queryParam.WhereQuery += fmt.Sprintf(" AND %s LIKE  ? ", CamelString2Snake(name))
+				if len(nv) > 0 {
+					if queryParam.WhereQuery == "" {
+						queryParam.WhereQuery = fmt.Sprintf(" %s LIKE  ? ", CamelString2Snake(name))
+					} else {
+						queryParam.WhereQuery += fmt.Sprintf(" AND %s LIKE  ? ", CamelString2Snake(name))
+					}
+					queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", nv))
 				}
-				queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", nv))
 
 			}
 		}
