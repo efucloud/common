@@ -218,16 +218,18 @@ func RequestQuery(name, paramType, queryType string, req *restful.Request, query
 	} else {
 		if strings.HasPrefix(name, "search:") {
 			value := req.QueryParameter("search")
-			nameList := strings.Split(strings.TrimPrefix(name, "search:"), ";")
-			var sqlList []string
-			for _, item := range nameList {
-				sqlList = append(sqlList, fmt.Sprintf(" %s %s ?", CamelString2Snake(item), queryType))
-				queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", value))
-			}
-			if queryParam.WhereQuery == "" {
-				queryParam.WhereQuery = fmt.Sprintf("(%s)", strings.Join(sqlList, " OR "))
-			} else {
-				queryParam.WhereQuery += fmt.Sprintf(" AND ( %s )", strings.Join(sqlList, " OR "))
+			if len(value) > 0 {
+				nameList := strings.Split(strings.TrimPrefix(name, "search:"), ";")
+				var sqlList []string
+				for _, item := range nameList {
+					sqlList = append(sqlList, fmt.Sprintf(" %s %s ?", CamelString2Snake(item), queryType))
+					queryParam.WhereArgs = append(queryParam.WhereArgs, fmt.Sprintf("%%%s%%", value))
+				}
+				if queryParam.WhereQuery == "" {
+					queryParam.WhereQuery = fmt.Sprintf("(%s)", strings.Join(sqlList, " OR "))
+				} else {
+					queryParam.WhereQuery += fmt.Sprintf(" AND ( %s )", strings.Join(sqlList, " OR "))
+				}
 			}
 		}
 		value := req.QueryParameter(name)
