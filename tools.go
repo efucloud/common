@@ -223,9 +223,16 @@ func StringsToUints(strings []string) (ints []uint) {
 		}
 	}
 	return
-
 }
-
+func FilterEmptyStrings(list []string) (results []string) {
+	for _, item := range list {
+		v := strings.TrimSpace(item)
+		if v != "" {
+			results = append(results, v)
+		}
+	}
+	return
+}
 func GetStructFieldsType(v interface{}) (fields map[string]string) {
 	fields = make(map[string]string)
 	dataType := reflect.TypeOf(v)
