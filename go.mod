@@ -4,14 +4,14 @@ go 1.24.0
 
 require (
 	github.com/denisbrodbeck/machineid v1.0.1
-	github.com/emicklei/go-restful-openapi/v2 v2.10.2
+	github.com/emicklei/go-restful-openapi/v2 v2.11.0
 	github.com/emicklei/go-restful/v3 v3.11.0
 	github.com/fatih/structs v1.1.0
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/golang-jwt/jwt/v5 v5.2.2
-	github.com/nicksnyder/go-i18n/v2 v2.2.1
+	github.com/nicksnyder/go-i18n/v2 v2.6.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.45.0
 	golang.org/x/net v0.47.0
