@@ -25,6 +25,7 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/yaml.v3"
 	"io"
 	"k8s.io/klog/v2"
 	"os"
@@ -85,8 +86,8 @@ func GetModuleFiles(dirPath string) (dirs []string, modules map[string][]string,
 func LoadConfig(path string, object interface{}) {
 	if strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml") {
 		if data, err := os.ReadFile(path); err == nil {
-			if err = json.Unmarshal(data, object); err != nil {
-				klog.Fatalf("Unable to decode application %s json config from file, err: %s", path, err)
+			if err = yaml.Unmarshal(data, object); err != nil {
+				klog.Fatalf("Unable to decode application %s yaml config from file, err: %s", path, err)
 			}
 		} else {
 			klog.Fatalf("Unable to read application %s yaml config from file, err: %s", path, err)
