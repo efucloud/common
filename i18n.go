@@ -30,7 +30,7 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"go.uber.org/zap"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"path"
 )
 
