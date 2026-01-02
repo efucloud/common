@@ -14,7 +14,7 @@ type LongText string
 func (LongText) GormDataType() string {
 	// 这里不能直接知道 db 类型，所以通常返回一个通用名，
 	// 然后在 GormDBDataType 中处理
-	return "longtext"
+	return "long_text"
 }
 
 // GormDBDataType 在实际建表时被调用，可访问 db 对象
